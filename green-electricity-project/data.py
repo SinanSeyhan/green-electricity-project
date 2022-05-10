@@ -1,1 +1,1 @@
-# To read all the data necesarry
+# For reading all the data necessary

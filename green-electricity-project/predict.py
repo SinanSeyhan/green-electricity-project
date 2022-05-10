@@ -1,1 +1,1 @@
-# to predict with trained models
+# for predicting data with trained models
