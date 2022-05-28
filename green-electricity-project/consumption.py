@@ -1,4 +1,3 @@
-from typing_extensions import Self
 import pandas as pd
 import numpy as np
 
@@ -20,7 +19,7 @@ class Consumption():
     def __init__(self, consumption_path = 'raw_data/Consumption_Cleaned.csv', exports_path = 'raw_data/Exports_Cleaned.csv',
                  country = ['EU'],
                  get_quartiles=True,
-                 quartiles_asc=False, quartile_col='2019'):
+                 quartiles_asc=True, quartile_col='2019'):
 
         self.unused_cats= [
             "Availableforfinalconsumption", "Finalconsumption",
@@ -119,32 +118,42 @@ class Consumption():
 
         return exports_by_country
 
+
+
     def groupby_quartiles(self):
-        self.cons_df_by_energy_bal[
-            self.quartile_col + '_perc'] = self.cons_df_by_energy_bal[
+        '''
+        Sort consumption categories by value and group them by quartiles
+        '''
+        # Calculate percentage of each consumption category
+        self.cons_df_by_energy_bal[self.quartile_col + '_perc'] = self.cons_df_by_energy_bal[
                 self.quartile_col] / self.cons_df_by_energy_bal[
                     self.quartile_col].sum() * 100
 
-        cumulative = self.cons_df_by_energy_bal[
-            self.quartile_col +
-            '_perc'].sort_values(ascending=self.quartiles_asc).cumsum()
+        # Create column containing the cumulative sum of the sorted percentage values
+        cumulative = self.cons_df_by_energy_bal[self.quartile_col + '_perc'].sort_values(ascending=self.quartiles_asc).cumsum()
+
 
         if self.quartiles_asc == False:
+            # Create quartiles beginning with the highest percentage including the lower boundary values
+            # Add boolean column for each quartile (one hot encoded)
             self.cons_df_by_energy_bal[1] = cumulative >= 75
             self.cons_df_by_energy_bal[2] = cumulative.between(50,75,inclusive='left')
             self.cons_df_by_energy_bal[3] = cumulative.between(25,50,inclusive='left')
             self.cons_df_by_energy_bal[4] = cumulative < 25
 
         elif self.quartiles_asc == True:
+            # Create quartiles beginning with the lowest percentage including the upper boundary values
+            # Add boolean column for each quartile (one hot encoded)
             self.cons_df_by_energy_bal[1] = cumulative <= 25
             self.cons_df_by_energy_bal[2] = cumulative.between(25,50,inclusive='right')
             self.cons_df_by_energy_bal[3] = cumulative.between(50,75,inclusive='right')
             self.cons_df_by_energy_bal[4] = cumulative > 75
 
-        self.cons_df_by_energy_bal['quartile'] = (
-            self.cons_df_by_energy_bal.iloc[:, 1:] == 1).idxmax(1)
+        # Inverse One Hot Encoding: Create "quartile" column and set it as index
+        self.cons_df_by_energy_bal['quartile'] = (self.cons_df_by_energy_bal.iloc[:, 1:] == 1).idxmax(1)
         self.cons_df_by_energy_bal.set_index('quartile',inplace=True)
 
+        # Remove "one hot encoded" Quartile Columns and group dataframe by quartile
         self.cons_df_by_energy_bal = self.cons_df_by_energy_bal.loc[:, '1990':'2020']
         self.cons_df_by_energy_bal = self.cons_df_by_energy_bal.groupby('quartile').sum()
 
@@ -152,24 +161,19 @@ class Consumption():
 
 
     def prepare_consumption_and_export(self):
-
+        # load prepared consumption and export dataframes
         cons_df = self.get_consumption()
         exp_df = self.get_exports()
-        #if self.single_country == False:
-        # replace total summed up exports with exports to non-EU countries
+
+        # replace total summed up exports with exports to non-selected countries (don't count domestic exports!)
         cons_df_by_energy_bal = pd.DataFrame(cons_df.groupby('energy_balance').sum())
         cons_df_by_energy_bal.loc[['Exports']] = exp_df.loc[:, '1990':].sum().values
-
-        #elif self.single_country == True:
-        #cons_df_by_energy_bal = pd.DataFrame(
-        #cons_df[cons_df['Country'] == self.country].groupby('energy_balance').sum())
 
         self.cons_df_by_energy_bal = cons_df_by_energy_bal
 
         if self.get_quartiles == True:
             cons_df_by_energy_bal = self.groupby_quartiles()
-
-        self.cons_df_by_energy_bal = cons_df_by_energy_bal
+            self.cons_df_by_energy_bal = cons_df_by_energy_bal
 
         return cons_df_by_energy_bal
 
