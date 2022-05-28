@@ -1,4 +1,5 @@
 # Python file to get the cleaned up version of Exports Database
+from cmath import exp
 import pandas as pd
 import numpy as np
 
@@ -78,10 +79,11 @@ class Exports():
 
         return exports
 
-    def get_total_exports(self):
+    def get_total_eu_exports(self):
         '''
         Gives total exports per country
         '''
-        exports = Exports().get_exports()
+        exports = Exports().get_eu_exports()
         exports_grouped = exports.groupby(by='country').sum()
+        exports_grouped = exports_grouped.drop(columns=['EU?'])
         return exports_grouped
