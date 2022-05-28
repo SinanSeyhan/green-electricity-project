@@ -2,6 +2,7 @@
 from cmath import exp
 import pandas as pd
 import numpy as np
+from pyparsing import col
 
 class Exports():
     def __init__(self):
@@ -23,6 +24,7 @@ class Exports():
         temp = Exports().get_exports()
 
         # 27 EU Countries
+        global EU_Countries
         EU_Countries = ['Belgium', 'Bulgaria', 'Czechia', 'Denmark', 'Germany', 'Estonia', 'Ireland',
                         'Greece', 'Spain', 'France', 'Croatia', 'Italy', 'Cyprus', 'Latvia', 'Lithuania',
                         'Luxembourg', 'Hungary', 'Malta', 'Netherlands (the)', 'Austria', 'Poland', 'Portugal',
@@ -81,9 +83,20 @@ class Exports():
 
     def get_total_eu_exports(self):
         '''
-        Gives total exports per country
+        Gives total exports to EU countries
         '''
-        exports = Exports().get_eu_exports()
-        exports_grouped = exports.groupby(by='country').sum()
-        exports_grouped = exports_grouped.drop(columns=['EU?'])
-        return exports_grouped
+        exports_grouped = Exports().get_eu_exports()
+
+        exports_grouped['Partner_EU'] = exports_grouped['partner'].isin(EU_Countries)
+        exports_grouped.drop(columns=['partner', 'unit', 'Alpha_2_code'], axis=1, inplace=True)
+        exports_grouped = exports_grouped[['country', 'Partner_EU', 'partner_country', 'EU?',
+                                            '1990', '1991', '1992', '1993', '1994', '1995', '1996', '1997', '1998',
+                                            '1999', '2000', '2001', '2002', '2003', '2004', '2005', '2006', '2007',
+                                            '2008', '2009', '2010', '2011', '2012', '2013', '2014', '2015', '2016',
+                                            '2017', '2018', '2019', '2020']]
+
+        # Grouping with EU/non-EU countries
+        EU_grouped = exports_grouped.groupby(['country', 'Partner_EU', 'partner_country']).sum()
+        EU_grouped.drop(columns=['EU?'], axis=1, inplace=True)
+        EU_grouped = EU_grouped[~(EU_grouped==0).all(axis=1)]
+        return EU_grouped
