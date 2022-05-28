@@ -14,21 +14,18 @@ class Plot():
         fig.show()
 
 class DemocracyIndex():
-    '''
-    Prepares the democracy index of the countries.
-    Data taken from: https://en.wikipedia.org/wiki/Democracy_Index
-    Country: Name of the country
-
-    Regime Type: Type of democracy in the country
-
-    EU?: Whether the country is in EU27
-    '''
     def __init__(self):
         pass
 
     def get_democracy_index(self):
         '''
-        Gives the democracy index of the countries
+        Gives the democracy index of the countries.
+        Data taken from: https://en.wikipedia.org/wiki/Democracy_Index
+        Country: Name of the country
+
+        Regime Type: Type of democracy in the country
+
+        EU?: Whether the country is in EU27
         '''
         DEMOCRACY_INDEX_PATH = '../raw_data/Democracy_Index.csv'
         df = pd.read_csv(DEMOCRACY_INDEX_PATH)
