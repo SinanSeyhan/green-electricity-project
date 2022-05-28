@@ -58,6 +58,8 @@ class Trainer():
     def predict(self, horizon=16):
         '''
         Prediction function
+
+        horizon: prediction in years
         '''
         future = self.model.make_future_dataframe(periods=horizon, freq='Y')
         forecast = self.model.predict(future)
@@ -65,19 +67,24 @@ class Trainer():
 
         return forecast
 
-    def cross_validate(self):
+    def cross_validate(self, horizon=16):
         '''
         Cross validating the model
+
+        horizon: prediction in years
         '''
-        cv_results = cross_validation(model=model, initial=f'{365 * 20} days', horizon='365 days', period='180 days')
+        cv_results = cross_validation(model=self.model, initial=f'{365 * horizon} days', horizon='365 days', period='180 days')
         df_performance = performance_metrics(cv_results)
         return df_performance
 
-    def plot_cross_validate(self):
+    def plot_cross_validate(self, horizon=16):
         '''
         Plotting function for the cross validation
+
+        horizon: prediction in years
+
         '''
-        cv_results = cross_validation(model=self.model, initial=f'{365 * 20} days', horizon='365 days', period='180 days')
+        cv_results = cross_validation(model=self.model, initial=f'{365 * horizon} days', horizon='365 days', period='180 days')
         plot_cross_validation_metric(cv_results, metric='mape')
 
 
