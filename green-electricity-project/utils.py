@@ -14,7 +14,16 @@ class Plot():
         fig.show()
 
 class DemocracyIndex():
-    def __init__(self) -> None:
+    '''
+    Prepares the democracy index of the countries.
+    Data taken from: https://en.wikipedia.org/wiki/Democracy_Index
+    Country: Name of the country
+
+    Regime Type: Type of democracy in the country
+
+    EU?: Whether the country is in EU27
+    '''
+    def __init__(self):
         pass
 
     def get_democracy_index(self):
