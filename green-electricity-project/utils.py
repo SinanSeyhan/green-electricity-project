@@ -21,6 +21,7 @@ class DemocracyIndex():
         '''
         Gives the democracy index of the countries
         '''
-        df = pd.read_csv('../raw_data/Democracy_Index.csv')
+        DEMOCRACY_INDEX_PATH = '../raw_data/Democracy_Index.csv'
+        df = pd.read_csv(DEMOCRACY_INDEX_PATH)
 
         return df
