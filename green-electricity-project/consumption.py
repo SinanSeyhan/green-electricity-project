@@ -124,40 +124,41 @@ class Consumption():
         '''
         Sort consumption categories by value and group them by quartiles
         '''
+        cons_df_by_energy_bal = self.cons_df_by_energy_bal
         # Calculate percentage of each consumption category
-        self.cons_df_by_energy_bal[self.quartile_col + '_perc'] = self.cons_df_by_energy_bal[
-                self.quartile_col] / self.cons_df_by_energy_bal[
-                    self.quartile_col].sum() * 100
+        cons_df_by_energy_bal[self.quartile_col + '_perc'] = cons_df_by_energy_bal[self.quartile_col] / cons_df_by_energy_bal[self.quartile_col].sum() * 100
 
         # Create column containing the cumulative sum of the sorted percentage values
-        cumulative = self.cons_df_by_energy_bal[self.quartile_col + '_perc'].sort_values(ascending=self.quartiles_asc).cumsum()
+        cumulative = cons_df_by_energy_bal[self.quartile_col + '_perc'].sort_values(ascending=self.quartiles_asc).cumsum()
 
 
         if self.quartiles_asc == False:
             # Create quartiles beginning with the highest percentage including the lower boundary values
             # Add boolean column for each quartile (one hot encoded)
-            self.cons_df_by_energy_bal[1] = cumulative >= 75
-            self.cons_df_by_energy_bal[2] = cumulative.between(50,75,inclusive='left')
-            self.cons_df_by_energy_bal[3] = cumulative.between(25,50,inclusive='left')
-            self.cons_df_by_energy_bal[4] = cumulative < 25
+            cons_df_by_energy_bal[1] = cumulative >= 75
+            cons_df_by_energy_bal[2] = cumulative.between(50,75,inclusive='left')
+            cons_df_by_energy_bal[3] = cumulative.between(25,50,inclusive='left')
+            cons_df_by_energy_bal[4] = cumulative < 25
 
         elif self.quartiles_asc == True:
             # Create quartiles beginning with the lowest percentage including the upper boundary values
             # Add boolean column for each quartile (one hot encoded)
-            self.cons_df_by_energy_bal[1] = cumulative <= 25
-            self.cons_df_by_energy_bal[2] = cumulative.between(25,50,inclusive='right')
-            self.cons_df_by_energy_bal[3] = cumulative.between(50,75,inclusive='right')
-            self.cons_df_by_energy_bal[4] = cumulative > 75
+            cons_df_by_energy_bal[1] = cumulative <= 25
+            cons_df_by_energy_bal[2] = cumulative.between(25,50,inclusive='right')
+            cons_df_by_energy_bal[3] = cumulative.between(50,75,inclusive='right')
+            cons_df_by_energy_bal[4] = cumulative > 75
+
+        self.cons_df_by_energy_bal_quartiles = cons_df_by_energy_bal.copy()
 
         # Inverse One Hot Encoding: Create "quartile" column and set it as index
-        self.cons_df_by_energy_bal['quartile'] = (self.cons_df_by_energy_bal.iloc[:, 1:] == 1).idxmax(1)
-        self.cons_df_by_energy_bal.set_index('quartile',inplace=True)
+        cons_df_by_energy_bal['quartile'] = (cons_df_by_energy_bal.iloc[:, 1:] == 1).idxmax(1)
+        cons_df_by_energy_bal.set_index('quartile',inplace=True)
 
         # Remove "one hot encoded" Quartile Columns and group dataframe by quartile
-        self.cons_df_by_energy_bal = self.cons_df_by_energy_bal.loc[:, '1990':'2020']
-        self.cons_df_by_energy_bal = self.cons_df_by_energy_bal.groupby('quartile').sum()
+        cons_df_by_energy_bal = cons_df_by_energy_bal.loc[:, '1990':'2020']
+        cons_df_by_energy_bal = cons_df_by_energy_bal.groupby('quartile').sum()
 
-        return self.cons_df_by_energy_bal
+        return cons_df_by_energy_bal
 
 
     def prepare_consumption_and_export(self):
