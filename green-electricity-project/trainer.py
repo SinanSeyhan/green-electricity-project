@@ -50,7 +50,7 @@ class Trainer():
 
     def fit(self, train):
         '''
-        Function to train the model on a train dataset
+        Function to train and fit the model on a train dataset
         '''
         self.model = Trainer().initialize_model()
         self.model.fit(train)
