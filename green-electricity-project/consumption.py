@@ -201,10 +201,6 @@ class Consumption():
         return cons_df_by_energy_bal
 
 if __name__ == "__main__":
-<<<<<<< HEAD
     consumption = Consumption()
-=======
-    consumption = Consumption(quartiles_asc=False)
->>>>>>> 85afeebb4ae1ab604654ccef2023576bb8aac245
     cons_exp_quart_desc = consumption.prepare_consumption_and_export()
     print(cons_exp_quart_desc)
