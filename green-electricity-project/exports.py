@@ -12,6 +12,7 @@ class Exports():
         '''
         Load the complete export csv file.
         '''
+        pd.set_option('mode.chained_assignment', None)
         EXPORTS_PATH = '../raw_data/ElecExportsByPartnerCountry.csv'
         temp = pd.read_csv(EXPORTS_PATH)
         return temp
@@ -42,11 +43,6 @@ class Exports():
         exports = exports.merge(countries, on='partner', how='left')
         exports.drop(columns=['Alpha_3_code'], axis=1, inplace=True)
         exports.rename({'Country': 'partner_country'}, axis=1, inplace=True)
-        exports = exports[['freq', 'siec', 'partner', 'partner_country', 'unit', 'Alpha_2_code',
-                            '1990', '1991', '1992', '1993', '1994', '1995', '1996', '1997', '1998',
-                            '1999', '2000', '2001', '2002', '2003', '2004', '2005', '2006', '2007',
-                            '2008', '2009', '2010', '2011', '2012', '2013', '2014', '2015', '2016',
-                            '2017', '2018', '2019', '2020']]
 
         # Merging with countries DataFrame for country
         countries = pd.read_csv(COUNTRIES_PATH, encoding = 'unicode_escape')
@@ -55,11 +51,7 @@ class Exports():
         exports = exports.merge(countries, on='Alpha_2_code', how='left')
         exports.drop(columns=['Alpha_3_code', 'freq', 'siec'], axis=1, inplace=True)
         exports.rename({'Country': 'country'}, axis=1, inplace=True)
-        exports = exports[['partner', 'partner_country', 'unit', 'country', 'Alpha_2_code',
-                            '1990', '1991', '1992', '1993', '1994', '1995', '1996', '1997', '1998',
-                            '1999', '2000', '2001', '2002', '2003', '2004', '2005', '2006', '2007',
-                            '2008', '2009', '2010', '2011', '2012', '2013', '2014', '2015', '2016',
-                            '2017', '2018', '2019', '2020']]
+
 
         # Filtering EU Countries
         exports['EU?'] = exports['country'].isin(EU_Countries)
@@ -99,4 +91,5 @@ class Exports():
         EU_grouped = exports_grouped.groupby(['country', 'Partner_EU', 'partner_country']).sum()
         EU_grouped.drop(columns=['EU?'], axis=1, inplace=True)
         EU_grouped = EU_grouped[~(EU_grouped==0).all(axis=1)]
+
         return EU_grouped
