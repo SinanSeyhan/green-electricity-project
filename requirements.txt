@@ -9,6 +9,7 @@ numpy
 pandas
 scikit-learn
 prophet
+sklearn
 
 # tests/linter
 black
