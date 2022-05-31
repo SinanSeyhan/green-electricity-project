@@ -18,7 +18,7 @@ class Consumption():
     '''
     def __init__(self, consumption_path = 'raw_data/Consumption_Cleaned.csv', exports_path = 'raw_data/Exports_Cleaned.csv',
                  country = ['EU'],
-                 get_quartiles=True,
+                 groupby='subcat',
                  quartiles_asc=True, quartile_col='2019'):
 
         self.unused_cats= [
@@ -30,7 +30,7 @@ class Consumption():
         self.consumption_path = consumption_path
         self.exports_path = exports_path
         self.country = country
-        self.get_quartiles = get_quartiles
+        self.groupby = groupby
         self.quartiles_asc = quartiles_asc
         self.quartile_col = quartile_col
 
@@ -118,6 +118,24 @@ class Consumption():
 
         return exports_by_country
 
+    def groupby_subcat(self):
+        '''
+        Group consumption subcategories together
+        '''
+        cons_df_by_energy_bal = self.cons_df_by_energy_bal.reset_index()
+        # Split energy balance text by '-', create new columns for each text section between '-',
+        # only keep first two columns (category and subcategory), if there is no subcategory name in
+        # second column (None), replace None with 'Total'
+        cons_df_grouped_subcat = cons_df_by_energy_bal.energy_balance.str.rsplit(
+            "-", expand=True).loc[:, :1].replace({None: 'Total'})
+        # Combine first two columns to one column
+        cons_df_by_energy_bal['grouped_subcat'] = cons_df_grouped_subcat[
+            0].astype(str) + '-' + cons_df_grouped_subcat[1].astype(str)
+        # Group by new created first column (subcategories)
+        cons_df_by_energy_bal = cons_df_by_energy_bal.groupby('grouped_subcat').sum()
+
+
+        return cons_df_by_energy_bal
 
 
     def groupby_quartiles(self):
@@ -172,8 +190,11 @@ class Consumption():
 
         self.cons_df_by_energy_bal = cons_df_by_energy_bal
 
-        if self.get_quartiles == True:
+        if self.groupby == 'quartiles':
             cons_df_by_energy_bal = self.groupby_quartiles()
+            self.cons_df_by_energy_bal = cons_df_by_energy_bal
+        elif self.groupby == 'subcat':
+            cons_df_by_energy_bal = self.groupby_subcat()
             self.cons_df_by_energy_bal = cons_df_by_energy_bal
 
         return cons_df_by_energy_bal
