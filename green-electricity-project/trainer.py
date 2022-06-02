@@ -41,11 +41,13 @@ class Trainer():
         '''
         Function to initialize the Prophet model
         '''
-        self.model = Prophet(seasonality_mode='multiplicative',
+        self.model = Prophet(growth='linear',
+                            seasonality_mode='multiplicative',
                             yearly_seasonality=True,
                             weekly_seasonality=False,
                             daily_seasonality=False,
-                            interval_width=0.95)
+                            interval_width=0.95,
+                            seasonality_prior_scale=4)
         return self.model
 
     def fit(self, train):
