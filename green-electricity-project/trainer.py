@@ -30,9 +30,13 @@ class Trainer():
 
         return df
 
-    def split(self, data, year:int):
+    def split(self, data, year:str):
         '''
         Splitting the data according to the year.
+
+        data: the dataframe.
+
+        year: the year 'string' to split the data into train and test.
         '''
         data = Trainer().preproc(data)
         df = data
