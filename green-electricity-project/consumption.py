@@ -8,9 +8,10 @@ class Consumption():
     exports_path: path to Exports .csv-file
     country:
         list: select country name or 'EU' for EU as a whole, multiple countries can be passed to group them
-    get_quartiles:
-        if True, group consumption categories ("energy_balance") by quartiles based on consumption within the year defined in "quartile_col"
-        if False, retrieve raw consumption categories
+    groupby:
+        'quartiles': group consumption categories ("energy_balance") by quartiles based on consumption within the year defined in "quartile_col"
+        'subcat': group consumption categories ("energy_balance") by subcategories
+        None: retrieve raw consumption categories
     quartiles_asc:
         if True, first quartile (1) is lowest 25 percent (cumulative sum from 0 to 25 percent, including 25 percent)
         if False, first quartile (1) is highest 25 percent (cumulative sum from 75 to 100 percent, including 75 percent)
@@ -200,6 +201,6 @@ class Consumption():
         return cons_df_by_energy_bal
 
 if __name__ == "__main__":
-    consumption = Consumption(quartiles_asc=False)
+    consumption = Consumption()
     cons_exp_quart_desc = consumption.prepare_consumption_and_export()
     print(cons_exp_quart_desc)
