@@ -51,3 +51,8 @@ class DemocracyIndex():
         df_eu.drop(columns=['EU?'], axis=1, inplace=True)
 
         return df_eu
+
+    def plot_democracy_index(self):
+        temp = DemocracyIndex().get_eu_democracy_index()
+        fig = px.bar(temp, x="Regime type", y="Country")
+        return fig

@@ -6,8 +6,6 @@ from plotly.subplots import make_subplots
 import plotly.graph_objects as go
 import plotly.io as pio
 import plotly.express as px
-from matplotlib_venn import venn2, venn2_circles, venn2_unweighted
-from matplotlib_venn import venn3, venn3_circles
 from matplotlib import pyplot as plt
 import os
 
@@ -37,7 +35,7 @@ class Imports():
             Overall_Pivot_Percent[year]=pd.to_numeric(Overall_Pivot_Percent[year], errors='raise', downcast='float')
 
         # Filter out totals
-        Overall_Percent_Country = Overall_Pivot_Percent[Overall_Percent_Country['EU_Partner'].str.contains('Total', case=False, na=False).any(level=0)]
+        Overall_Percent_Country = Overall_Pivot_Percent[Overall_Pivot_Percent['EU_Partner'].str.contains('Total', case=False, na=False).any(level=0)]
 
         col_values = ['TRUE', 'FALSE']
         Overall_Percent_Country = Overall_Percent_Country[Overall_Percent_Country['Partner_EU'].str.contains('|'.join(col_values), case=False, na=False).any(level=0)]
@@ -83,7 +81,7 @@ class Imports():
         Merge Partners file with Democracy index
         '''
         democracy = self.get_democracy()
-        Partners_Pivot_Percent = self.get_overall_partners
+        Partners_Pivot_Percent = self.get_overall_partners()
         Partners_Overall = Partners_Pivot_Percent.merge(democracy, on='Partner_country', how='left')
         Partners_Overall = Partners_Overall[Partners_Overall['Country']=='']
 
@@ -189,5 +187,9 @@ class Imports():
 
         fig = px.line(Partners_NonEU_pivot, x='Year', y='Percent_total_imports', color='Regime_type',
              title='Percentage of Overall Imports from Non-EU Partners')
-
+        print(Partners_NonEU_pivot)
         return fig
+
+
+if __name__ == '__main__':
+    Imports().Democracy_visualize()

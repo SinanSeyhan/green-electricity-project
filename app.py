@@ -6,8 +6,7 @@ import importlib
 
 st.markdown(''' ***Power Plants*** ''')
 power_module = importlib.import_module("green-electricity-project.powerplants", package=True).PowerPlants()
-df = power_module.get_eu_power_plants()
-df
+st.plotly_chart(power_module.plot_eu_mix(), sharing='streamlit')
 
 
 st.markdown(''' ***Exports*** ''')
@@ -17,10 +16,17 @@ df_exp
 
 st.markdown(''' ***Democracy Index*** ''')
 utils_module = importlib.import_module("green-electricity-project.utils", package=True).DemocracyIndex()
-df_exp = utils_module.get_eu_democracy_index()
-df_exp
+st.plotly_chart(figure_or_data=utils_module.plot_democracy_index(), sharing='streamlit')
 
-st.markdown(''' ***Model*** ''')
-validate_module = importlib.import_module("green-electricity-project.predict", package=True).Prediction()
-df_exp = validate_module.validate_EU_countries()
-df_exp
+
+
+st.markdown(''' ***Democracy Index*** ''')
+imports_module = importlib.import_module("green-electricity-project.Electricity_Imports", package=True).Imports()
+st.plotly_chart(figure_or_data=imports_module.EU_visualize(), sharing='streamlit')
+st.plotly_chart(figure_or_data=imports_module.Democracy_visualize(), sharing='streamlit')
+#imports_module.overall_imports()
+
+# st.markdown(''' ***Model*** ''')
+# validate_module = importlib.import_module("green-electricity-project.predict", package=True).Prediction()
+# df_exp = validate_module.validate_EU_countries()
+# df_exp
