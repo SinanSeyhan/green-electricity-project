@@ -3,6 +3,7 @@ from cmath import exp
 import pandas as pd
 import numpy as np
 from pyparsing import col
+import os
 
 class Exports():
     def __init__(self):
@@ -13,7 +14,9 @@ class Exports():
         Load the complete export csv file.
         '''
         pd.set_option('mode.chained_assignment', None)
-        EXPORTS_PATH = '../raw_data/ElecExportsByPartnerCountry.csv'
+        my_path = os.path.abspath(os.path.dirname(__file__))
+        EXPORTS_PATH = os.path.join(my_path, "../raw_data/ElecExportsByPartnerCountry.csv")
+        #EXPORTS_PATH = '../raw_data/ElecExportsByPartnerCountry.csv'
         temp = pd.read_csv(EXPORTS_PATH)
         return temp
 
@@ -21,7 +24,8 @@ class Exports():
         '''
         Function that gives the EU countries exports.
         '''
-        COUNTRIES_PATH = '../raw_data/CountryCodes.csv'
+        my_path = os.path.abspath(os.path.dirname(__file__))
+        COUNTRIES_PATH = os.path.join(my_path, '../raw_data/CountryCodes.csv')
         temp = Exports().get_exports()
 
         # 27 EU Countries

@@ -2,6 +2,7 @@
 import pandas as pd
 import plotly.express as px
 import seaborn as sns
+import os
 
 class Plot():
     def __init__(self):
@@ -29,7 +30,9 @@ class DemocracyIndex():
         '''
 
         pd.set_option('mode.chained_assignment', None)
-        DEMOCRACY_INDEX_PATH = '../raw_data/Democracy_Index.csv'
+        my_path = os.path.abspath(os.path.dirname(__file__))
+        DEMOCRACY_INDEX_PATH = os.path.join(my_path, '../raw_data/Democracy_Index.csv')
+
         df = pd.read_csv(DEMOCRACY_INDEX_PATH)
 
         return df

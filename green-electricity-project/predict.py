@@ -30,7 +30,6 @@ class Prediction():
             data.rename({data.columns[0]: 0}, axis=1, inplace=True)
 
             split = trainer_module.split(data, year='2018')[0]
-            print(country)
             model = trainer_module.initialize_model()
             model.fit(split)
             pred[country] = trainer_module.predict(horizon=13)[['ds', 'yhat']]

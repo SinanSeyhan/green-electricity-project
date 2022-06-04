@@ -1,6 +1,16 @@
 import streamlit as st
+import importlib
 '''
-# TaxiFareModel front
+# Green Electricity Project
 '''
 
-st.markdown(''' ***TEST*** ''')
+st.markdown(''' ***Power Plants*** ''')
+power_module = importlib.import_module("green-electricity-project.powerplants", package=True).PowerPlants()
+df = power_module.get_eu_power_plants()
+df
+
+
+st.markdown(''' ***Exports*** ''')
+exports_module = importlib.import_module("green-electricity-project.exports", package=True).Exports()
+df_exp = exports_module.get_total_eu_exports()
+df_exp
