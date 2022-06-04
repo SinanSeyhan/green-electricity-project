@@ -104,7 +104,7 @@ class PowerPlants():
 
     def plot_eu_mix(self):
         df = PowerPlants().get_eu_power_plants()
-        fig = px.pie(df, values='percent_nuclear', names='country', title='Energy Mix')
+        fig = px.pie(df, values='percent_nuclear', names='country', title='Nuclear Production Comparison Between Countries')
         return fig
 if __name__ == '__main__':
     df = PowerPlants().get_eu_power_plants()
