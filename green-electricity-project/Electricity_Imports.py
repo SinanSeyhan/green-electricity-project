@@ -125,7 +125,7 @@ class Imports():
 
 
     def EU_visualize(self):
-        Overall_Percent_Country = self.get_imports()
+        Overall_Percent_Country = self.overall_imports()
 
         # Create df showing only EU countries
         Overall_true = Overall_Percent_Country[Overall_Percent_Country['Partner_EU']=='TRUE Total'].rename(columns={'Partner_EU': 'EU Member'})
