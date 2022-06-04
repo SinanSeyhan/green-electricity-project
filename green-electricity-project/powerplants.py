@@ -3,6 +3,8 @@ import pandas as pd
 import numpy as np
 from sklearn.cluster import KMeans
 import os
+import plotly.express as px
+import plotly.graph_objects as go
 
 class PowerPlants():
     def __init__(self):
@@ -100,5 +102,10 @@ class PowerPlants():
 
         return df_eu
 
+    def plot_eu_mix(self):
+        df = PowerPlants().get_eu_power_plants()
+        fig = px.pie(df, values='percent_nuclear', names='country', title='Energy Mix')
+        return fig
 if __name__ == '__main__':
-    print(PowerPlants().get_eu_power_plants())
+    df = PowerPlants().get_eu_power_plants()
+    print(df.columns)
