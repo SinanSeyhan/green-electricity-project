@@ -5,8 +5,6 @@ import os
 class Consumption():
     '''
     Prepares consumption data and replaces export entry with data from export file if necessary.
-    consumption_path: path to Consumption .csv-file
-    exports_path: path to Exports .csv-file
     country:
         list: select country name or 'EU' for EU as a whole, multiple countries can be passed to group them
     groupby:
@@ -18,7 +16,7 @@ class Consumption():
         if False, first quartile (1) is highest 25 percent (cumulative sum from 75 to 100 percent, including 75 percent)
     quartile_col: column name (year as a string) which the calculated quartiles are based on
     '''
-    def __init__(self, exports_path = 'raw_data/Exports_Cleaned.csv',
+    def __init__(self,
                  country = ['EU'],
                  groupby='subcat',
                  quartiles_asc=True, quartile_col='2019'):
