@@ -80,6 +80,7 @@ class Imports():
         '''
         Merge Partners file with Democracy index
         '''
+        pd.set_option('mode.chained_assignment', None)
         democracy = self.get_democracy()
         Partners_Pivot_Percent = self.get_overall_partners()
         Partners_Overall = Partners_Pivot_Percent.merge(democracy, on='Partner_country', how='left')
@@ -174,7 +175,7 @@ class Imports():
                           margin=dict(t=80, b=0, l=70, r=40),
                           hovermode="y unified",
                           xaxis_title=' ', yaxis_title=" ",
-                          plot_bgcolor='beige', paper_bgcolor='white')
+                          plot_bgcolor='grey', paper_bgcolor='grey')
 
         fig.update_layout(autosize=False,
                           width=900,

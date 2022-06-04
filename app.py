@@ -1,32 +1,57 @@
 import streamlit as st
 import importlib
+import pandas as pd
+import matplotlib.pyplot as plt
+
 '''
-# Green Electricity Project
+# ***Green Electricity Project***
+
+TODO:
+
+- HEROKU Connection
+
+- Prediction Consumption Chart
+
+- Energy Mix Chart with country filtering
+
+- Exports Chart
+
+-
+
 '''
 
-st.markdown(''' ***Power Plants*** ''')
+st.markdown(''' **Democracy Index** ''')
+imports_module = importlib.import_module("green-electricity-project.Electricity_Imports", package=True).Imports()
+st.plotly_chart(figure_or_data=imports_module.EU_visualize(), sharing='streamlit')
+#st.plotly_chart(figure_or_data=imports_module.Democracy_visualize(), sharing='streamlit')
+
+
+#st.markdown(''' ***Predicting Production*** ''')
+
+
+st.markdown(''' **Power Plants** ''')
 power_module = importlib.import_module("green-electricity-project.powerplants", package=True).PowerPlants()
 st.plotly_chart(power_module.plot_eu_mix(), sharing='streamlit')
 
+st.markdown(''' ***Consumption*** ''')
+consumption_module = importlib.import_module("green-electricity-project.consumption", package=True).Consumption()
+df = consumption_module.prepare_consumption_and_export()
+df
 
-st.markdown(''' ***Exports*** ''')
-exports_module = importlib.import_module("green-electricity-project.exports", package=True).Exports()
-df_exp = exports_module.get_total_eu_exports()
-df_exp
+st.markdown(''' **Model** ''')
+trainer_module = importlib.import_module("green-electricity-project.trainer", package=True).Trainer()
+consumption_module = importlib.import_module("green-electricity-project.consumption", package=True).Consumption()
+df = consumption_module.get_consumption()
+temp = df[df['energy_balance']=='Finalconsumption-transportsector-energyuse']
+pred = {}
 
-st.markdown(''' ***Democracy Index*** ''')
-utils_module = importlib.import_module("green-electricity-project.utils", package=True).DemocracyIndex()
-st.plotly_chart(figure_or_data=utils_module.plot_democracy_index(), sharing='streamlit')
+eu_df = pd.DataFrame(temp.groupby('Alpha_2_code').sum().sum())
+split = trainer_module.split(eu_df, year='2018')[0]
+model = trainer_module.initialize_model()
+model.fit(split)
+pred = trainer_module.predict(horizon=13)[['ds', 'yhat']]
+df = pd.DataFrame.from_dict(pred)
+df
 
-
-
-st.markdown(''' ***Democracy Index*** ''')
-imports_module = importlib.import_module("green-electricity-project.Electricity_Imports", package=True).Imports()
-st.plotly_chart(figure_or_data=imports_module.EU_visualize(), sharing='streamlit')
-st.plotly_chart(figure_or_data=imports_module.Democracy_visualize(), sharing='streamlit')
-#imports_module.overall_imports()
-
-# st.markdown(''' ***Model*** ''')
-# validate_module = importlib.import_module("green-electricity-project.predict", package=True).Prediction()
-# df_exp = validate_module.validate_EU_countries()
-# df_exp
+st.plotly_chart(plt.plot(df.ds, df.yhat))
+st.plotly_chart(split)
