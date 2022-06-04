@@ -2,6 +2,7 @@
 import pandas as pd
 import numpy as np
 from sklearn.cluster import KMeans
+import os
 
 class PowerPlants():
     def __init__(self):
@@ -14,7 +15,10 @@ class PowerPlants():
 
 
         '''
-        POWER_PLANTS_PATH = '../raw_data/Power_Plants_Cleaned.csv'
+        # Path for Streamlit
+        my_path = os.path.abspath(os.path.dirname(__file__))
+        POWER_PLANTS_PATH = os.path.join(my_path, "../raw_data/Power_Plants_Cleaned.csv")
+
         df = pd.read_csv(POWER_PLANTS_PATH)
         return df
 
