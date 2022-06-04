@@ -17,7 +17,7 @@ class Consumption():
         if False, first quartile (1) is highest 25 percent (cumulative sum from 75 to 100 percent, including 75 percent)
     quartile_col: column name (year as a string) which the calculated quartiles are based on
     '''
-    def __init__(self, consumption_path = 'raw_data/Consumption_Cleaned.csv', exports_path = 'raw_data/Exports_Cleaned.csv',
+    def __init__(self, consumption_path = '../raw_data/Consumption_Cleaned.csv', exports_path = 'raw_data/Exports_Cleaned.csv',
                  country = ['EU'],
                  groupby='subcat',
                  quartiles_asc=True, quartile_col='2019'):
