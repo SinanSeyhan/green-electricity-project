@@ -15,6 +15,11 @@ exports_module = importlib.import_module("green-electricity-project.exports", pa
 df_exp = exports_module.get_total_eu_exports()
 df_exp
 
+st.markdown(''' ***Democracy Index*** ''')
+utils_module = importlib.import_module("green-electricity-project.utils", package=True).DemocracyIndex()
+df_exp = utils_module.get_eu_democracy_index()
+df_exp
+
 st.markdown(''' ***Model*** ''')
 validate_module = importlib.import_module("green-electricity-project.predict", package=True).Prediction()
 df_exp = validate_module.validate_EU_countries()
