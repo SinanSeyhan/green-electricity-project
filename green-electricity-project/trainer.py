@@ -28,10 +28,22 @@ class Trainer():
         df.rename(columns={'index':'ds', 0: 'y'}, inplace=True)
         df['ds'] = pd.to_datetime(df['ds'], format='%Y') + pd.to_timedelta(364, unit='D')
 
-        # Train test split:
-        split = int(len(df)*0.7)
+        return df
 
-        self.train = df.iloc[:split]
+    def split(self, data, year:str):
+        '''
+        Splitting the data according to the year.
+
+        data: the dataframe.
+
+        year: the year 'string' to split the data into train and test.
+        '''
+        data = Trainer().preproc(data)
+        df = data
+        # Train test split:
+        split = data[data['ds'].dt.strftime('%Y') == f'{year}'].index.values[0]
+
+        self.train = data[:split]
         self.test = df.iloc[split:]
 
         return self.train, self.test
@@ -41,11 +53,13 @@ class Trainer():
         '''
         Function to initialize the Prophet model
         '''
-        self.model = Prophet(seasonality_mode='multiplicative',
+        self.model = Prophet(growth='linear',
+                            seasonality_mode='multiplicative',
                             yearly_seasonality=True,
                             weekly_seasonality=False,
                             daily_seasonality=False,
-                            interval_width=0.95)
+                            interval_width=0.95,
+                            seasonality_prior_scale=4)
         return self.model
 
     def fit(self, train):

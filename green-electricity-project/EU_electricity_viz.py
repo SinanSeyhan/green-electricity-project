@@ -11,6 +11,9 @@ class EuElecProduction():
     def __init__(self, path):
         self.df = None
         self.path = path
+        self.columns = ['1990','1991','1992','1993','1994','1995','1996','1997','1998','1999','2000',
+                '2001','2002','2003','2004','2005','2006','2007','2008','2009','2010',
+                '2011','2012','2013','2014','2015','2016','2017','2018','2019','2020']
 
     def get_data(self):
         '''Function to Import relevant files and complete preprocessing
@@ -56,10 +59,13 @@ class EuElecProduction():
 
         return EU_production_annual, columns
     
-    def EU_Total_Elec_production(EU_production_annual, columns):
+    def EU_Total_Elec_production(self, EU_production_annual):
         #EU Annual Electricity Production
-        EU_production_annual[columns]= EU_production_annual[columns].apply(pd.to_numeric, errors = 'coerce')
-        EU_production_annual.loc['EU_Total'] = EU_production_annual[columns].sum()
+        columns = ['1990','1991','1992','1993','1994','1995','1996','1997','1998','1999','2000',
+                '2001','2002','2003','2004','2005','2006','2007','2008','2009','2010',
+                '2011','2012','2013','2014','2015','2016','2017','2018','2019','2020']
+        EU_production_annual[self.columns]= EU_production_annual[self.columns].apply(pd.to_numeric, errors = 'coerce')
+        EU_production_annual.loc['EU_Total'] = EU_production_annual[self.columns].sum()
         EU_Total_Elec_production = EU_production_annual
         return EU_Total_Elec_production
 
@@ -73,7 +79,7 @@ class EuElecProduction():
     def EU_Total_GEP(EU_production_annual, columns):
         #Adding EU Total GEP by year as a separate dataframe (for easy further analysis)
         EU_Total_GEP = EU_production_annual.loc[EU_production_annual['nrg_bal'] == 'GEP']
-        EU_Total_GEP = pd.DataFrame(EU_production_annual[columns].sum())
+        EU_Total_GEP = pd.DataFrame(EU_production_annual[self.columns].sum())
         EU_Total_GEP = EU_Total_GEP.rename(columns={0:'GEP'})
         return EU_Total_GEP
 
