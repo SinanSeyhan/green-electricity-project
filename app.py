@@ -73,6 +73,6 @@ pred = trainer_module.predict(horizon=13)[['ds', 'yhat']]
 df = pd.DataFrame.from_dict(pred)
 df
 
-st.plotly_chart(plt.plot(df.ds, df.yhat))
+st.plotly_chart((df.ds, df.yhat))
 st.plotly_chart(split)
 st.markdown("""---""")
