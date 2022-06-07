@@ -31,6 +31,8 @@ st.plotly_chart(figure_or_data=imports_module.EU_visualize(), sharing='streamlit
 
 st.markdown(''' **Power Plants** ''')
 power_module = importlib.import_module("green-electricity-project.powerplants", package=True).PowerPlants()
+df = power_module.get_eu_power_plants()
+df
 st.plotly_chart(power_module.plot_eu_mix(), sharing='streamlit')
 
 st.markdown(''' ***Consumption*** ''')
