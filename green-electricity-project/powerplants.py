@@ -112,6 +112,11 @@ class PowerPlants():
         return df_eu
 
     def plot_eu_mix(self, country):
+        '''
+        Plots a country's Energy Mix
+
+        country: str
+        '''
         df = self.get_eu_power_plants()
         df.rename({'percent_biomass': 'Biomass',
                 'percent_coal': 'Coal',
@@ -158,7 +163,6 @@ class PowerPlants():
                     )
         # Text inside the Sectors
         fig.update_traces(textposition = 'outside' , textinfo = 'percent+label')
-        fig.update_traces()
         return fig
 
 
