@@ -1,5 +1,5 @@
 # packaging
-pip>=9
+pip
 setuptools
 twine
 wheel>=0.29
@@ -30,5 +30,5 @@ joblib
 memoized-property
 termcolor
 plotly
-importlib
-os
+#importlib
+#os
