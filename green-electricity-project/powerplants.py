@@ -1,10 +1,13 @@
 # Python file to get the cleaned up version of Power Plants Database
+from matplotlib.pyplot import plot_date
 import pandas as pd
 import numpy as np
 from sklearn.cluster import KMeans
 import os
 import plotly.express as px
+from dash import Dash, dcc, html, Input, Output
 import plotly.graph_objects as go
+from sqlalchemy import column
 
 class PowerPlants():
     def __init__(self):
@@ -32,7 +35,7 @@ class PowerPlants():
         Gives a dataframe for 27 EU countries the energy mix in percent and in GW.
         '''
         pd.set_option('mode.chained_assignment', None)
-        df = PowerPlants().get_power_plants()
+        df = self.get_power_plants()
         df_eu = df[df['EU?']==True]
         df_eu.reset_index(drop=True, inplace=True)
         df_eu.drop(columns=['Unnamed: 0', 'EU?', 'count_distinct_fuel', 'count_distinct_name', 'count_distinct_owner',
@@ -47,6 +50,12 @@ class PowerPlants():
                             'count_fuel_nuclear', 'count_fuel_oil', 'count_fuel_other', 'count_fuel_petcoke', 'count_fuel_solar',
                             'count_fuel_storage', 'count_fuel_waste', 'count_fuel_wave_and_tidal', 'count_fuel_wind', 'iso_code'],
                             axis= 1, inplace=True)
+
+        # Add EU total as the last row
+        temp = df_eu.sum(axis=0, numeric_only=True)
+        EU = dict(temp)
+        EU['country'] = 'EU'
+        df_eu = df_eu.append(EU, ignore_index=True)
 
         # Malta has all NaN values. Converted to zeros
         df_eu[df_eu['country']=='Malta'] = df_eu[df_eu['country']=='Malta'].replace(np.NaN, 0)
@@ -88,7 +97,7 @@ class PowerPlants():
 
         '''
         # Loading dataset
-        df_eu = PowerPlants().get_eu_power_plants()
+        df_eu = self.get_eu_power_plants()
 
         # Declaring Model
         model = KMeans(n_clusters)
@@ -102,10 +111,63 @@ class PowerPlants():
 
         return df_eu
 
-    def plot_eu_mix(self):
-        df = PowerPlants().get_eu_power_plants()
-        fig = px.pie(df, values='percent_nuclear', names='country', title='Nuclear Production Comparison Between Countries')
+    def plot_eu_mix(self, country):
+        '''
+        Plots a country's Energy Mix
+
+        country: str
+        '''
+        df = self.get_eu_power_plants()
+        df.rename({'percent_biomass': 'Biomass',
+                'percent_coal': 'Coal',
+                'percent_gas': 'Gas',
+                'percent_geothermal': 'Geothermal',
+                'percent_hydro': 'Hydro',
+                'percent_nuclear': 'Nuclear',
+                'percent_oil': 'Oil',
+                'percent_other': 'Other',
+                'percent_solar': 'Solar',
+                'percent_waste': 'Waste',
+                'percent_wave_and_tidal': 'Wave and Tidal',
+                'percent_wind': 'Wind'
+            },axis=1, inplace=True)
+        plot_df = df[df['country']==country]
+        plot_df = plot_df.drop(columns=['total_capacity_gw', 'total_gw_calculated', 'max_capacity_mw', 'capacity_gw_fuel_biomass', 'capacity_gw_fuel_coal',
+                                        'capacity_gw_fuel_gas', 'capacity_gw_fuel_geothermal', 'capacity_gw_fuel_hydro', 'capacity_gw_fuel_nuclear',
+                                        'capacity_gw_fuel_oil', 'capacity_gw_fuel_other', 'capacity_gw_fuel_solar', 'capacity_gw_fuel_waste',
+                                        'capacity_gw_fuel_wave_and_tidal', 'capacity_gw_fuel_wind'], axis=1)
+        plot_df = plot_df[plot_df!=0]
+        plot_df = plot_df.dropna(axis=1)
+        names = list(plot_df.drop(columns='country', axis=1).columns)
+        values = list(plot_df.drop(columns='country', axis=1).values[0])
+
+        fig = px.pie(data_frame=plot_df.T,
+                    values=values,
+                    names=names,
+                    hole=0.3,
+                    color=names,
+                    color_discrete_map = {'Biomass': 'darkgreen',
+                                        'Coal': 'dimgray',
+                                        'Gas': 'saddlebrown',
+                                        'Geothermal': 'fuchsia',
+                                        'Hydro': 'lightseagreen',
+                                        'Nuclear': 'greenyellow',
+                                        'Oil': 'darkbrown',
+                                        'Other': 'white',
+                                        'Solar': 'goldenrod',
+                                        'Waste': 'chocolate',
+                                        'Wave and Tidal': 'navy',
+                                        'Wind': 'deepskyblue'},
+                    width=(800),
+                    height=(800)
+                    )
+        # Text inside the Sectors
+        fig.update_traces(textposition = 'outside' , textinfo = 'percent+label')
         return fig
+
+
+
+
+
 if __name__ == '__main__':
-    df = PowerPlants().get_eu_power_plants()
-    print(df.columns)
+    print(PowerPlants().plot_eu_mix('Austria'))
