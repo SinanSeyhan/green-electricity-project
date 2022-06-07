@@ -5,7 +5,6 @@ import numpy as np
 from sklearn.cluster import KMeans
 import os
 import plotly.express as px
-from dash import Dash, dcc, html, Input, Output
 import plotly.graph_objects as go
 from sqlalchemy import column
 
