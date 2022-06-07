@@ -1,10 +1,13 @@
 # Python file to get the cleaned up version of Power Plants Database
+from matplotlib.pyplot import plot_date
 import pandas as pd
 import numpy as np
 from sklearn.cluster import KMeans
 import os
 import plotly.express as px
+from dash import Dash, dcc, html, Input, Output
 import plotly.graph_objects as go
+from sqlalchemy import column
 
 class PowerPlants():
     def __init__(self):
@@ -108,44 +111,59 @@ class PowerPlants():
 
         return df_eu
 
-    def plot_eu_mix(self):
+    def plot_eu_mix(self, country):
         df = self.get_eu_power_plants()
-        fig = px.pie(df, values='percent_biomass', names='country', title='Energy Mix in Electricity')
+        df.rename({'percent_biomass': 'Biomass',
+                'percent_coal': 'Coal',
+                'percent_gas': 'Gas',
+                'percent_geothermal': 'Geothermal',
+                'percent_hydro': 'Hydro',
+                'percent_nuclear': 'Nuclear',
+                'percent_oil': 'Oil',
+                'percent_other': 'Other',
+                'percent_solar': 'Solar',
+                'percent_waste': 'Waste',
+                'percent_wave_and_tidal': 'Wave and Tidal',
+                'percent_wind': 'Wind'
+            },axis=1, inplace=True)
+        plot_df = df[df['country']==country]
+        plot_df = plot_df.drop(columns=['total_capacity_gw', 'total_gw_calculated', 'max_capacity_mw', 'capacity_gw_fuel_biomass', 'capacity_gw_fuel_coal',
+                                        'capacity_gw_fuel_gas', 'capacity_gw_fuel_geothermal', 'capacity_gw_fuel_hydro', 'capacity_gw_fuel_nuclear',
+                                        'capacity_gw_fuel_oil', 'capacity_gw_fuel_other', 'capacity_gw_fuel_solar', 'capacity_gw_fuel_waste',
+                                        'capacity_gw_fuel_wave_and_tidal', 'capacity_gw_fuel_wind'], axis=1)
+        plot_df = plot_df[plot_df!=0]
+        plot_df = plot_df.dropna(axis=1)
+        names = list(plot_df.drop(columns='country', axis=1).columns)
+        values = list(plot_df.drop(columns='country', axis=1).values[0])
 
-        # Dropdown menu
-        fig.update_layout(
-            updatemenus=[go.layout.Updatemenu(
-                active=0,
-                buttons=list(
-                    [dict(label = 'All',
-                        method = 'update',
-                        args = [{'visible': [True, True, True, True]},
-                                {'title': 'All',
-                                'showlegend':True}]),
-                    dict(label = 'MSFT',
-                        method = 'update',
-                        args = [{'visible': [True, False, False, False]}, # the index of True aligns with the indices of plot traces
-                                {'title': 'MSFT',
-                                'showlegend':True}]),
-                    dict(label = 'AAPL',
-                        method = 'update',
-                        args = [{'visible': [False, True, False, False]},
-                                {'title': 'AAPL',
-                                'showlegend':True}]),
-                    dict(label = 'AMZN',
-                        method = 'update',
-                        args = [{'visible': [False, False, True, False]},
-                                {'title': 'AMZN',
-                                'showlegend':True}]),
-                    dict(label = 'GOOGL',
-                        method = 'update',
-                        args = [{'visible': [False, False, False, True]},
-                                {'title': 'GOOGL',
-                                'showlegend':True}]),
-                    ])
-                )
-            ])
+        fig = px.pie(data_frame=plot_df.T,
+                    values=values,
+                    names=names,
+                    hole=0.3,
+                    color=names,
+                    color_discrete_map = {'Biomass': 'darkgreen',
+                                        'Coal': 'dimgray',
+                                        'Gas': 'saddlebrown',
+                                        'Geothermal': 'fuchsia',
+                                        'Hydro': 'lightseagreen',
+                                        'Nuclear': 'greenyellow',
+                                        'Oil': 'darkbrown',
+                                        'Other': 'white',
+                                        'Solar': 'goldenrod',
+                                        'Waste': 'chocolate',
+                                        'Wave and Tidal': 'navy',
+                                        'Wind': 'deepskyblue'},
+                    width=(800),
+                    height=(800)
+                    )
+        # Text inside the Sectors
+        fig.update_traces(textposition = 'outside' , textinfo = 'percent+label')
+        fig.update_traces()
         return fig
+
+
+
+
+
 if __name__ == '__main__':
-    df = PowerPlants().get_eu_power_plants()
-    print(df)
+    print(PowerPlants().plot_eu_mix('Austria'))

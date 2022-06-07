@@ -29,11 +29,19 @@ st.plotly_chart(figure_or_data=imports_module.EU_visualize(), sharing='streamlit
 #st.markdown(''' ***Predicting Production*** ''')
 
 
-st.markdown(''' **Power Plants** ''')
+st.title('Energy Mix')
 power_module = importlib.import_module("green-electricity-project.powerplants", package=True).PowerPlants()
 df = power_module.get_eu_power_plants()
-df
-st.plotly_chart(power_module.plot_eu_mix(), sharing='streamlit')
+# Create dropdown menu:
+countries = tuple(df.country)
+option = st.selectbox(label='Please select the Country you want to see: ', options=countries)
+capa = df[df['country']==option]['total_gw_calculated'].values[0]
+
+st.markdown(f'Total capacity: ***{round(capa, 2)}*** GW')
+
+# Pie Chart
+st.header(f"{option}'s Energy Mix in Electricity")
+st.plotly_chart(power_module.plot_eu_mix(option), sharing='streamlit')
 
 st.markdown(''' ***Consumption*** ''')
 consumption_module = importlib.import_module("green-electricity-project.consumption", package=True).Consumption()
