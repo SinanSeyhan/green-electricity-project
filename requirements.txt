@@ -20,3 +20,4 @@ plotly
 folium
 streamlit-folium
 pystan
+openpyxl
