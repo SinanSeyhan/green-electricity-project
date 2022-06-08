@@ -50,8 +50,14 @@ st.plotly_chart(power_module.plot_eu_mix(option), sharing='streamlit')
 st.markdown("""---""")
 
 st.title('Power Plants Geolocation')
-m = power_module.plot_folium()
-st_folium(m)
+
+# Create dropdown menu:
+df = power_module.get_geolocation()
+fuel = tuple(sorted(df.primary_fuel.unique()))
+option = st.selectbox(label='Please select the Fuel type you want to see: ', options=fuel)
+
+m = power_module.plot_folium(option)
+st_folium(m, width=1000, height=800)
 st.markdown("""---""")
 
 st.title(''' ***Consumption*** ''')
@@ -61,22 +67,22 @@ df
 st.markdown("""---""")
 
 
-st.markdown("""---""")
-st.markdown(''' **Model** ''')
-trainer_module = importlib.import_module("green-electricity-project.trainer", package=True).Trainer()
-consumption_module = importlib.import_module("green-electricity-project.consumption", package=True).Consumption()
-df = consumption_module.get_consumption()
-temp = df[df['energy_balance']=='Finalconsumption-transportsector-energyuse']
-pred = {}
+# st.markdown("""---""")
+# st.markdown(''' **Model** ''')
+# trainer_module = importlib.import_module("green-electricity-project.trainer", package=True).Trainer()
+# consumption_module = importlib.import_module("green-electricity-project.consumption", package=True).Consumption()
+# df = consumption_module.get_consumption()
+# temp = df[df['energy_balance']=='Finalconsumption-transportsector-energyuse']
+# pred = {}
 
-eu_df = pd.DataFrame(temp.groupby('Alpha_2_code').sum().sum())
-split = trainer_module.split(eu_df, year='2018')[0]
-model = trainer_module.initialize_model()
-model.fit(split)
-pred = trainer_module.predict(horizon=13)[['ds', 'yhat']]
-df = pd.DataFrame.from_dict(pred)
-df
+# eu_df = pd.DataFrame(temp.groupby('Alpha_2_code').sum().sum())
+# split = trainer_module.split(eu_df, year='2018')[0]
+# model = trainer_module.initialize_model()
+# model.fit(split)
+# pred = trainer_module.predict(horizon=13)[['ds', 'yhat']]
+# df = pd.DataFrame.from_dict(pred)
+# df
 
-st.plotly_chart((df.ds, df.yhat))
-st.plotly_chart(split)
-st.markdown("""---""")
+# st.plotly_chart((df.ds, df.yhat))
+# st.plotly_chart(split)
+# st.markdown("""---""")

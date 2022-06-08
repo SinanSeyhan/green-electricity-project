@@ -32,3 +32,4 @@ termcolor
 plotly
 folium
 streamlit-folium
+pystan

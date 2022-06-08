@@ -167,7 +167,7 @@ class PowerPlants():
         '''
         my_path = os.path.abspath(os.path.dirname(__file__))
         POWER_PLANTS_ALL_PATH = os.path.join(my_path, "../raw_data/global_power_plant_database.csv")
-        df = pd.read_csv(POWER_PLANTS_ALL_PATH)
+        df = pd.read_csv(POWER_PLANTS_ALL_PATH, low_memory=False)
 
         EU_Countries = ['Belgium', 'Bulgaria', 'Czech Republic', 'Denmark', 'Germany', 'Estonia', 'Ireland',
                         'Greece', 'Spain', 'France', 'Croatia', 'Italy', 'Cyprus', 'Latvia', 'Lithuania',
@@ -187,25 +187,27 @@ class PowerPlants():
                         'estimated_generation_note_2014', 'estimated_generation_note_2015',
                         'estimated_generation_note_2016', 'estimated_generation_note_2017'], axis=1, inplace=True)
         df_eu = df[df['country_long'].isin(EU_Countries)]
-
+        df_eu.reset_index(drop=True, inplace=True)
         return df_eu
 
-    def plot_folium(self):
+    def plot_folium(self, fuel):
         '''
         Function to get the Folium Map for the Power Plants in EU
         '''
+        # country_long  capacity_mw  latitude  longitude primary_fuel
         df = self.get_geolocation()
-        geolocation = df[['latitude', 'longitude']]
-        EU_COORDINATES = (54.5260, 15.2551)
+        df = df[df['primary_fuel']==fuel]
+        geolocation = df.get(['latitude', 'longitude']).values.tolist()
+        popups = df.get(['country_long', 'capacity_mw', 'primary_fuel']).values.tolist()
+        EU_COORDINATES = (49.5260, 15.2551)
 
         # create empty map zoomed in on Europe
-        _map = folium.Map(location=EU_COORDINATES, zoom_start=5)
+        _map = folium.Map(location=EU_COORDINATES, zoom_start=4, tiles='cartodb positron', width=800, height=800, position='centered')
 
         # add a marker for every record in the filtered data, use a clustered view
-        MarkerCluster(geolocation).add_to(_map)
-
+        MarkerCluster(locations=geolocation, popups=popups, show=True).add_to(_map)
         return _map
 
 if __name__ == '__main__':
-    #print(PowerPlants().get_geolocation()['longitude'].nunique())
-    PowerPlants().plot_folium()
+    #print(PowerPlants().get_geolocation())
+    print(PowerPlants().plot_folium())
