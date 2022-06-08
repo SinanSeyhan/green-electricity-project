@@ -30,3 +30,5 @@ joblib
 memoized-property
 termcolor
 plotly
+folium
+streamlit-folium

@@ -1,7 +1,8 @@
 import streamlit as st
 import importlib
 import pandas as pd
-import matplotlib.pyplot as plt
+import folium
+from streamlit_folium import st_folium
 
 '''
 # ***Green Electricity Project***
@@ -48,7 +49,10 @@ st.header(f"{option}'s Energy Mix in Electricity")
 st.plotly_chart(power_module.plot_eu_mix(option), sharing='streamlit')
 st.markdown("""---""")
 
-
+st.title('Power Plants Geolocation')
+m = power_module.plot_folium()
+st_folium(m)
+st.markdown("""---""")
 
 st.title(''' ***Consumption*** ''')
 consumption_module = importlib.import_module("green-electricity-project.consumption", package=True).Consumption()

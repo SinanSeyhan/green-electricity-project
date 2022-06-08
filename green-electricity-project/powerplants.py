@@ -1,12 +1,11 @@
 # Python file to get the cleaned up version of Power Plants Database
-from matplotlib.pyplot import plot_date
 import pandas as pd
 import numpy as np
 from sklearn.cluster import KMeans
 import os
 import plotly.express as px
-import plotly.graph_objects as go
-from sqlalchemy import column
+import folium
+from folium.plugins import MarkerCluster
 
 class PowerPlants():
     def __init__(self):
@@ -16,8 +15,6 @@ class PowerPlants():
         '''
         Loads the Power Plants Database. Data taken from:
         https://github.com/wri/global-power-plant-database
-
-
         '''
         # Path for Streamlit
         my_path = os.path.abspath(os.path.dirname(__file__))
@@ -164,9 +161,51 @@ class PowerPlants():
         fig.update_traces(textposition = 'outside' , textinfo = 'percent+label')
         return fig
 
+    def get_geolocation(self):
+        '''
+        Function to get the geolocation of the Power Plants inside EU
+        '''
+        my_path = os.path.abspath(os.path.dirname(__file__))
+        POWER_PLANTS_ALL_PATH = os.path.join(my_path, "../raw_data/global_power_plant_database.csv")
+        df = pd.read_csv(POWER_PLANTS_ALL_PATH)
+
+        EU_Countries = ['Belgium', 'Bulgaria', 'Czech Republic', 'Denmark', 'Germany', 'Estonia', 'Ireland',
+                        'Greece', 'Spain', 'France', 'Croatia', 'Italy', 'Cyprus', 'Latvia', 'Lithuania',
+                        'Luxembourg', 'Hungary', 'Malta', 'Netherlands (the)', 'Austria', 'Poland', 'Portugal',
+                        'Romania', 'Slovenia', 'Slovakia', 'Finland', 'Sweden']
 
 
+        df.drop(columns=['country', 'name', 'gppd_idnr', 'other_fuel1', 'other_fuel2',
+                        'other_fuel3', 'commissioning_year', 'owner', 'source', 'url',
+                        'geolocation_source', 'wepp_id', 'year_of_capacity_data',
+                        'generation_gwh_2013', 'generation_gwh_2014', 'generation_gwh_2015',
+                        'generation_gwh_2016', 'generation_gwh_2017', 'generation_gwh_2018',
+                        'generation_gwh_2019', 'generation_data_source',
+                        'estimated_generation_gwh_2013', 'estimated_generation_gwh_2014',
+                        'estimated_generation_gwh_2015', 'estimated_generation_gwh_2016',
+                        'estimated_generation_gwh_2017', 'estimated_generation_note_2013',
+                        'estimated_generation_note_2014', 'estimated_generation_note_2015',
+                        'estimated_generation_note_2016', 'estimated_generation_note_2017'], axis=1, inplace=True)
+        df_eu = df[df['country_long'].isin(EU_Countries)]
 
+        return df_eu
+
+    def plot_folium(self):
+        '''
+        Function to get the Folium Map for the Power Plants in EU
+        '''
+        df = self.get_geolocation()
+        geolocation = df[['latitude', 'longitude']]
+        EU_COORDINATES = (54.5260, 15.2551)
+
+        # create empty map zoomed in on Europe
+        _map = folium.Map(location=EU_COORDINATES, zoom_start=5)
+
+        # add a marker for every record in the filtered data, use a clustered view
+        MarkerCluster(geolocation).add_to(_map)
+
+        return _map
 
 if __name__ == '__main__':
-    print(PowerPlants().plot_eu_mix('Austria'))
+    #print(PowerPlants().get_geolocation()['longitude'].nunique())
+    PowerPlants().plot_folium()
