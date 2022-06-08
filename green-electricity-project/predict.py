@@ -1,7 +1,6 @@
 # for predicting data with trained models
 import importlib
 import pandas as pd
-from sqlalchemy import column
 
 
 class Prediction():
