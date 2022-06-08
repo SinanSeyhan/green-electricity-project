@@ -20,4 +20,3 @@ plotly
 folium
 streamlit-folium
 pystan
-prophet pystan
