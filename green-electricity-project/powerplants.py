@@ -202,7 +202,7 @@ class PowerPlants():
         EU_COORDINATES = (49.5260, 15.2551)
 
         # create empty map zoomed in on Europe
-        _map = folium.Map(location=EU_COORDINATES, zoom_start=4, tiles='cartodb positron', width=800, height=800, position='centered')
+        _map = folium.Map(location=EU_COORDINATES, zoom_start=4, tiles='cartodb positron', position='centered')
 
         # add a marker for every record in the filtered data, use a clustered view
         MarkerCluster(locations=geolocation, popups=popups, show=True).add_to(_map)
