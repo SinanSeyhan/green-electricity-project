@@ -28,11 +28,27 @@ class ConsumptionVaP():
 
     def show_historic_consumption(self, content = 'all'):
         if content == 'top5':
-            self.fig = px.line(self.consumption_data.sort_values('2019', ascending=False).head(5).T, width=1000, height=400)
+            self.fig = px.line(self.consumption_data.sort_values('2019', ascending=False).head(5).T, height=1000, labels={
+                     "index": "Year",
+                     "value": "GWh"})
         elif content == 'all':
-            self.fig = px.line(self.consumption_data.sort_values('2019', ascending=False).T, width=1000, height=400)
+            self.fig = px.line(self.consumption_data.sort_values(
+                '2019', ascending=False).T,
+                               height=1000,
+                               labels={
+                                   "index": "Year",
+                                   "value": "GWh"
+                               })
         elif content == 'sum':
-            self.fig = px.line(pd.DataFrame(self.consumption_data.sum().T), width=1000, height=400)
+            self.fig = px.line(pd.DataFrame(self.consumption_data.sum().T),
+                               height=1000,
+                               labels={
+                                   "index": "Year",
+                                   "value": "GWh"
+                               })
+
+        self.fig.update_layout(hoverlabel_namelength=-1,
+            legend=dict(yanchor="top", x=0, xanchor="left", y=-0.2, title='Consumption Category'))
 
         #self.fig.show()
 
@@ -151,8 +167,9 @@ class ConsumptionVaP():
 
 
         self.fig_pred.update_layout(
+            hoverlabel_namelength=-1,
             updatemenus=[go.layout.Updatemenu(active=0, buttons=list_cat)],
-            width=1000,
+            width=800,
             height=600,
         )
 
