@@ -63,22 +63,22 @@ if run:
         unsafe_allow_html=True)
 
     st.plotly_chart(consumption.fig_pred, use_container_width=True)
-
+st.markdown("""---""")
 ###########################################
 
 ###############################
 ## PRODUCTION ##
 ###############################
 
-path = '../raw_data/Production_Cleaned.csv'
-production_module = importlib.import_module("green-electricity-project.production_viz", package=True).EuElecProduction()
-st.plotly_chart(production_module.GEP_pred_vs_Actual(), sharing='streamlit')
-
+# path = '../raw_data/Production_Cleaned.csv'
+# production_module = importlib.import_module("green-electricity-project.production_viz", package=True).EuElecProduction()
+# st.plotly_chart(production_module.GEP_pred_vs_Actual(), sharing='streamlit')
+st.markdown("""---""")
 ###############################
 ## ENERGY MIX ##
 ###############################
 
-st.markdown("""---""")
+
 st.title('Energy Mix of Countries')
 power_module = importlib.import_module("green-electricity-project.powerplants", package=True).PowerPlants()
 df = power_module.get_eu_power_plants()
