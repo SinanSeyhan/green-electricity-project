@@ -9,7 +9,7 @@ st.title('Green Electricity')
 st.subheader('Electricity, is it green or not?🤔')
 
 ###############################
-        ## IMPORTS ##
+## IMPORTS ##
 ###############################
 
 st.markdown("""---""")
@@ -23,7 +23,7 @@ st.plotly_chart(figure_or_data=imports_module.EU_visualize(), sharing='streamlit
 
 
 ###############################
-        ## ENERGY MIX ##
+## ENERGY MIX ##
 ###############################
 
 st.markdown("""---""")
@@ -43,17 +43,14 @@ st.header(f"{option}'s Energy Mix in Electricity")
 st.plotly_chart(power_module.plot_eu_mix(option), sharing='streamlit')
 st.markdown("""---""")
 
-<<<<<<< HEAD
-=======
 ###########################################
 
 
 
 
 ###########################################
-        ## GEOLOCATION POWER PLANTS ##
+## GEOLOCATION POWER PLANTS ##
 ###########################################
->>>>>>> 9b7b4a322d12ceecb7812b8b6121a2c1d20337bf
 
 st.title('Power Plants Geolocation')
 
@@ -66,7 +63,10 @@ m = power_module.plot_folium(option)
 st_folium(m, width=1000, height=800)
 st.markdown("""---""")
 
-<<<<<<< HEAD
+###########################################
+## CONSUMPTION ##
+###########################################
+
 st.title('Consumption')
 consumption_module = importlib.import_module(
     "green-electricity-project.consumption_viz_and_pred", package=True)
@@ -118,18 +118,7 @@ if run:
         unsafe_allow_html=True)
 
     st.plotly_chart(consumption.fig_pred, use_container_width=True)
-=======
-st.title(''' ***Consumption*** ''')
-consumption_module = importlib.import_module("green-electricity-project.consumption", package=True).Consumption()
-df = consumption_module.prepare_consumption_and_export()
 
-st.markdown("""---""")
-
-###########################################
-
-
-
->>>>>>> 9b7b4a322d12ceecb7812b8b6121a2c1d20337bf
 
 # st.markdown("""---""")
 # st.markdown(''' **Model** ''')
