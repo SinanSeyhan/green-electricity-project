@@ -4,24 +4,13 @@ import pandas as pd
 import folium
 from streamlit_folium import st_folium
 
-'''
-# ***Green Electricity Project***
 
-TODO:
+st.title('Green Electricity')
+st.subheader('Electricity, is it green or not?🤔')
 
-- HEROKU Connection
 
-- Prediction Consumption Chart
-
-- Energy Mix Chart with country filtering - DONE!
-
-- Exports Chart
-
--
-
-'''
 st.markdown("""---""")
-st.title(''' **Democracy Index** ''')
+st.title(''' **Imports** ''')
 imports_module = importlib.import_module("green-electricity-project.Electricity_Imports", package=True).Imports()
 st.plotly_chart(figure_or_data=imports_module.EU_visualize(), sharing='streamlit')
 #st.plotly_chart(figure_or_data=imports_module.Democracy_visualize(), sharing='streamlit')

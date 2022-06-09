@@ -194,20 +194,28 @@ class PowerPlants():
         '''
         Function to get the Folium Map for the Power Plants in EU
         '''
+        EU_COORDINATES = (49.5260, 15.2551)
+
         # country_long  capacity_mw  latitude  longitude primary_fuel
         df = self.get_geolocation()
         df = df[df['primary_fuel']==fuel]
         geolocation = df.get(['latitude', 'longitude']).values.tolist()
-        popups = df.get(['country_long', 'capacity_mw', 'primary_fuel']).values.tolist()
-        EU_COORDINATES = (49.5260, 15.2551)
+
+        # Create the popups:
+        country = df['country_long'].map('Country: {}'.format)
+        capacity = round(df['capacity_mw'], 0).map('Generation (GW): {}'.format)
+        fuel_type = df['primary_fuel'].map('Fuel Type: {}'.format)
+        popups = pd.concat([country, capacity, fuel_type], axis=1)#
+        popups['final'] = popups['country_long'] + ', ' + popups['capacity_mw'] + ', ' + popups['primary_fuel']
 
         # create empty map zoomed in on Europe
         _map = folium.Map(location=EU_COORDINATES, zoom_start=4, tiles='cartodb positron', position='centered')
 
         # add a marker for every record in the filtered data, use a clustered view
-        MarkerCluster(locations=geolocation, popups=popups, show=True).add_to(_map)
+        MarkerCluster(locations=geolocation, popups=popups['final'].values.tolist(), show=True).add_to(_map)
+
         return _map
 
 if __name__ == '__main__':
     #print(PowerPlants().get_geolocation())
-    print(PowerPlants().plot_folium())
+    print((PowerPlants().plot_folium('Coal')))
