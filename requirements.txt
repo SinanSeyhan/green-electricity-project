@@ -21,3 +21,4 @@ folium
 streamlit-folium
 pystan
 openpyxl
+seaborn

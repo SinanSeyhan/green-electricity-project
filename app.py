@@ -14,6 +14,7 @@ st.markdown("""---""")
 ###########################################
 
 st.title('Consumption')
+
 consumption_module = importlib.import_module(
     "green-electricity-project.consumption_viz_and_pred", package=True)
 
@@ -29,6 +30,7 @@ if load_prepared_predictions == False:
         'Spain', 'Sweden'),
         key='option_cons')
 
+<<<<<<< HEAD
     run = st.button("Predict Future Consumption")
 
     if run:
@@ -77,6 +79,15 @@ if load_prepared_predictions == True:
     for i in forecast_files:
         path = ''.join(('raw_data/forecast_consumption_eu/', i))
         forecasts_loaded.append(pd.read_csv(path))
+=======
+if run:
+    info = st.empty()
+    info.write('Predicting the future of electricity consumption...')
+
+    consumption = consumption_module.ConsumptionVaP(option_cons)
+    #@st.cache
+    consumption.run_viz_and_pred(info)
+>>>>>>> d1e0ce0cb8ccb3ee1ba22790147d29b6c54b382b
 
     st.markdown(''' ****Historic Consumption 1990 - 2020**** ''')
 
@@ -117,9 +128,13 @@ st.markdown("""---""")
 ## PRODUCTION ##
 ###############################
 st.title('Production')
-# path = '../raw_data/Production_Cleaned.csv'
-# production_module = importlib.import_module("green-electricity-project.production_viz", package=True).EuElecProduction()
-# st.plotly_chart(production_module.GEP_pred_vs_Actual(), sharing='streamlit')
+path = '../raw_data/Production_Cleaned.csv'
+production_module = importlib.import_module("green-electricity-project.production_viz", package=True).EuElecProduction()
+st.plotly_chart(production_module.GEP_pred_vs_Actual(), sharing='streamlit')
+
+#st.area_chart(production_module.Elec_Mix_chart())
+
+
 st.markdown("""---""")
 ###############################
 ## ENERGY MIX ##
