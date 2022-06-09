@@ -1,8 +1,10 @@
+from json import load
 import streamlit as st
 import importlib
 import pandas as pd
 import folium
 from streamlit_folium import st_folium
+import os
 
 
 st.title('Green Electricity')
@@ -17,24 +19,32 @@ st.title('Consumption')
 consumption_module = importlib.import_module(
     "green-electricity-project.consumption_viz_and_pred", package=True)
 
-option_cons = st.selectbox(
-    'Select a country',
-    ('EU', 'Austria', 'Belgium', 'Bulgaria', 'Croatia', 'Cyprus', 'Czech Republic',
-     'Denmark', 'Estonia', 'Finland', 'France', 'Germany', 'Greece', 'Hungary',
-     'Ireland', 'Italy', 'Latvia', 'Lithuania', 'Luxembourg', 'Malta',
-     'Netherlands', 'Poland', 'Portugal', 'Romania', 'Slovakia', 'Slovenia',
-     'Spain', 'Sweden'),
-    key='option_cons')
+load_prepared_predictions = True
+run = False
+if load_prepared_predictions == False:
+    option_cons = st.selectbox(
+        'Select a country',
+        ('EU', 'Austria', 'Belgium', 'Bulgaria', 'Croatia', 'Cyprus',
+         'Czech Republic', 'Denmark', 'Estonia', 'Finland', 'France',
+         'Germany', 'Greece', 'Hungary', 'Ireland', 'Italy', 'Latvia',
+         'Lithuania', 'Luxembourg', 'Malta', 'Netherlands', 'Poland',
+         'Portugal', 'Romania', 'Slovakia', 'Slovenia', 'Spain', 'Sweden'),
+        key='option_cons')
 
-run = st.button("Predict Future Consumption")
+    run = st.button("Predict Future Consumption")
 
-if run:
-    info = st.empty()
-    info.write('Predicting the future of electricity consumption...')
+    if run:
+        info = st.empty()
+        info.write('Predicting the future of electricity consumption...')
+
+elif load_prepared_predictions == True:
+    option_cons = 'EU'
+
+if load_prepared_predictions or run:
 
     consumption = consumption_module.ConsumptionVaP(option_cons)
     #@st.cache
-    consumption.run_viz_and_pred(info)
+    consumption.run_viz_and_pred(load_prep=load_prepared_predictions)
 
     st.markdown(''' ****Historic Consumption 1990 - 2020**** ''')
 
@@ -66,7 +76,11 @@ if run:
         unsafe_allow_html=True)
 
     st.plotly_chart(consumption.fig_pred, use_container_width=True)
+
+
 st.markdown("""---""")
+
+
 ###########################################
 
 ###############################
