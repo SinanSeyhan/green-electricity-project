@@ -177,10 +177,23 @@ class ConsumptionVaP():
 
         #self.fig_pred.show()
 
-    def run_viz_and_pred(self, info=None):
+    def run_viz_and_pred(self, info=None, load_prep=False):
         self.get_consumption_data()
         self.show_historic_consumption()
-        self.predict_future_consumption(info)
+
+        if load_prep == False:
+            self.predict_future_consumption(info)
+
+        elif load_prep == True:
+            forecast_files = sorted(
+                os.listdir('raw_data/forecast_consumption_eu/'))
+            forecasts_loaded = []
+            for i in forecast_files:
+                path = ''.join(('raw_data/forecast_consumption_eu/', i))
+                forecasts_loaded.append(pd.read_csv(path))
+
+            self.forecast_list = forecasts_loaded
+
         self.show_future_consumption()
 
 
