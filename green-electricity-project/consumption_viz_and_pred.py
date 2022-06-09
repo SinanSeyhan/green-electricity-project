@@ -193,6 +193,7 @@ class ConsumptionVaP():
                 forecasts_loaded.append(pd.read_csv(path))
 
             self.forecast_list = forecasts_loaded
+            self.get_total_future_consumption()
 
         self.show_future_consumption()
 
