@@ -7,62 +7,7 @@ from streamlit_folium import st_folium
 
 st.title('Green Electricity')
 st.subheader('Electricity, is it green or not?🤔')
-
-###############################
-## IMPORTS ##
-###############################
-
 st.markdown("""---""")
-st.title(''' **Imports** ''')
-imports_module = importlib.import_module("green-electricity-project.Electricity_Imports", package=True).Imports()
-st.plotly_chart(figure_or_data=imports_module.EU_visualize(), sharing='streamlit')
-
-###########################################
-
-
-
-
-###############################
-## ENERGY MIX ##
-###############################
-
-st.markdown("""---""")
-st.title('Energy Mix of Countries')
-power_module = importlib.import_module("green-electricity-project.powerplants", package=True).PowerPlants()
-df = power_module.get_eu_power_plants()
-# Create dropdown menu:
-countries = tuple(df.country)
-option = st.selectbox(label='Please select the Country you want to see: ', options=countries)
-
-# Total generation capacity:
-capa = df[df['country'] == option]['total_gw_calculated'].values[0]
-st.subheader(f'Total capacity of **{option}**: ***{round(capa, 2)}*** GW')
-
-# Pie Chart
-st.header(f"{option}'s Energy Mix in Electricity")
-st.plotly_chart(power_module.plot_eu_mix(option), sharing='streamlit')
-st.markdown("""---""")
-
-###########################################
-
-
-
-
-###########################################
-## GEOLOCATION POWER PLANTS ##
-###########################################
-
-st.title('Power Plants Geolocation')
-
-# Create dropdown menu:
-df = power_module.get_geolocation()
-fuel = tuple(sorted(df.primary_fuel.unique()))
-option = st.selectbox(label='Please select the Fuel Type you want to see: ', options=fuel)
-
-m = power_module.plot_folium(option)
-st_folium(m, width=1000, height=800)
-st.markdown("""---""")
-
 ###########################################
 ## CONSUMPTION ##
 ###########################################
@@ -71,22 +16,30 @@ st.title('Consumption')
 consumption_module = importlib.import_module(
     "green-electricity-project.consumption_viz_and_pred", package=True)
 
-option_cons = st.selectbox(
-    'Select a country',
-    ('EU', 'Austria', 'Belgium', 'Bulgaria', 'Croatia', 'Cyprus', 'Czech Republic',
-     'Denmark', 'Estonia', 'Finland', 'France', 'Germany', 'Greece', 'Hungary',
-     'Ireland', 'Italy', 'Latvia', 'Lithuania', 'Luxembourg', 'Malta',
-     'Netherlands', 'Poland', 'Portugal', 'Romania', 'Slovakia', 'Slovenia',
-     'Spain', 'Sweden'),
-    key='option_cons')
+load_prepared_predictions = True
 
-run = st.button("Predict Future Consumption")
+if load_prepared_predictions == False:
+    option_cons = st.selectbox(
+        'Select a country',
+        ('EU', 'Austria', 'Belgium', 'Bulgaria', 'Croatia', 'Cyprus', 'Czech Republic',
+        'Denmark', 'Estonia', 'Finland', 'France', 'Germany', 'Greece', 'Hungary',
+        'Ireland', 'Italy', 'Latvia', 'Lithuania', 'Luxembourg', 'Malta',
+        'Netherlands', 'Poland', 'Portugal', 'Romania', 'Slovakia', 'Slovenia',
+        'Spain', 'Sweden'),
+        key='option_cons')
 
-if run:
-    info = st.empty()
-    info.write('Predicting the future of electricity consumption...')
+    run = st.button("Predict Future Consumption")
+
+    if run:
+        info = st.empty()
+        info.write('Predicting the future of electricity consumption...')
+        consumption = consumption_module.ConsumptionVaP(option_cons)
+        consumption.run_viz_and_pred(info)
+
+elif load_prepared_predictions == True:
+    option_cons = 'EU'
     consumption = consumption_module.ConsumptionVaP(option_cons)
-    consumption.run_viz_and_pred(info)
+    consumption.run_viz_and_pred(load_prep = True)
 
     st.markdown(''' ****Historic Consumption 1990 - 2020**** ''')
 
@@ -120,22 +73,68 @@ if run:
     st.plotly_chart(consumption.fig_pred, use_container_width=True)
 
 
-# st.markdown("""---""")
-# st.markdown(''' **Model** ''')
-# trainer_module = importlib.import_module("green-electricity-project.trainer", package=True).Trainer()
-# consumption_module = importlib.import_module("green-electricity-project.consumption", package=True).Consumption()
-# df = consumption_module.get_consumption()
-# temp = df[df['energy_balance']=='Finalconsumption-transportsector-energyuse']
-# pred = {}
 
-# eu_df = pd.DataFrame(temp.groupby('Alpha_2_code').sum().sum())
-# split = trainer_module.split(eu_df, year='2018')[0]
-# model = trainer_module.initialize_model()
-# model.fit(split)
-# pred = trainer_module.predict(horizon=13)[['ds', 'yhat']]
-# df = pd.DataFrame.from_dict(pred)
-# df
+st.markdown("""---""")
+###########################################
 
-# st.plotly_chart((df.ds, df.yhat))
-# st.plotly_chart(split)
-# st.markdown("""---""")
+###############################
+## PRODUCTION ##
+###############################
+st.title('Production')
+# path = '../raw_data/Production_Cleaned.csv'
+# production_module = importlib.import_module("green-electricity-project.production_viz", package=True).EuElecProduction()
+# st.plotly_chart(production_module.GEP_pred_vs_Actual(), sharing='streamlit')
+st.markdown("""---""")
+###############################
+## ENERGY MIX ##
+###############################
+
+
+st.title('Energy Mix of Countries')
+power_module = importlib.import_module("green-electricity-project.powerplants", package=True).PowerPlants()
+df = power_module.get_eu_power_plants()
+# Create dropdown menu:
+countries = tuple(df.country)
+option = st.selectbox(label='Please select the Country you want to see: ', options=countries)
+
+# Total generation capacity:
+capa = df[df['country'] == option]['total_gw_calculated'].values[0]
+st.subheader(f'Total capacity of **{option}**: ***{round(capa, 2)}*** GW')
+
+# Pie Chart
+st.header(f"{option}'s Energy Mix in Electricity")
+st.plotly_chart(power_module.plot_eu_mix(option), sharing='streamlit')
+st.markdown("""---""")
+
+###########################################
+
+
+###########################################
+## GEOLOCATION POWER PLANTS ##
+###########################################
+
+st.title('Power Plants Geolocation')
+
+# Create dropdown menu:
+df = power_module.get_geolocation()
+fuel = tuple(sorted(df.primary_fuel.unique()))
+option = st.selectbox(label='Please select the Fuel Type you want to see: ', options=fuel)
+
+m = power_module.plot_folium(option)
+st_folium(m, width=1000, height=800)
+st.markdown("""---""")
+
+###########################################
+
+
+
+###############################
+## IMPORTS ##
+###############################
+
+st.title(''' **Imports** ''')
+imports_module = importlib.import_module("green-electricity-project.Electricity_Imports", package=True).Imports()
+st.plotly_chart(figure_or_data=imports_module.EU_visualize(), sharing='streamlit')
+st.markdown("""---""")
+
+###########################################
