@@ -36,7 +36,7 @@ class EuElecProduction():
         '''Create a dataframe for EU countries along with alpha-2-code'''
 
         EU_countries = pd.DataFrame.from_dict([{'Belgium': 'BE', 'Bulgaria': 'BG', 'Czechia': 'CZ', 'Denmark': 'DK', 'Germany': 'DE', 'Estonia': 'EE', 'Ireland': 'IE', 'Greece': 'EL',
-                        'Spain': 'ES', 'France': 'FR', 'Croatia': 'HR', 'Italy': 'IT', 'Cyprus': 'CY', 'Latvia': 'LV', 'Lithuania': 'LT', 'Luxembourg': 'LU', 
+                        'Spain': 'ES', 'France': 'FR', 'Croatia': 'HR', 'Italy': 'IT', 'Cyprus': 'CY', 'Latvia': 'LV', 'Lithuania': 'LT', 'Luxembourg': 'LU',
                         'Hungary': 'HU', 'Malta': 'MT', 'Netherlands': 'NL', 'Austria': 'AT', 'Poland': 'PL', 'Portugal': 'PT', 'Romania': 'RO', 'Slovenia': 'SI',
                         'Slovakia': 'SK', 'Finland': 'FI', 'Sweden': 'SE'}])
 
@@ -48,7 +48,7 @@ class EuElecProduction():
         EU_production_annual = EU_production_annual.loc[EU_production_annual['operator'] == 'TOTAL']
         EU_production_annual = EU_production_annual.loc[EU_production_annual['plants'] == 'TOTAL']
         EU_production_annual = EU_production_annual.loc[EU_production_annual['siec'] == 'TOTAL']
-        
+
         return EU_production_annual
 
     # def EU_Total_Elec_production(self):
@@ -58,13 +58,13 @@ class EuElecProduction():
     #     EU_Total_Elec_production = EU_production_annual.groupby('nrg_bal').sum()
     #     EU_Total_Elec_production = EU_Total_Elec_production.reset_index(inplace=True)
     #     return EU_Total_Elec_production
-    
+
     def EU_Total_Elec_nrg_bal(self):
         EU_production_annual =  self.EU_production_annual()
         EU_production_annual[self.columns]= EU_production_annual[self.columns].apply(pd.to_numeric, errors = 'coerce')
         EU_Total_Elec_nrg_bal = EU_production_annual.groupby('nrg_bal').sum()
         return EU_Total_Elec_nrg_bal
-            
+
     def EU_GEP_pred(self):
         '''Predicting EU Electricity production upto 2030 using FB prophet'''
         EU_Total_Elec_nrg_bal =  self.EU_Total_Elec_nrg_bal()
@@ -75,9 +75,9 @@ class EuElecProduction():
         train, test = trainer.split(GEP_data, year='2018')
         model = trainer.initialize_model()
         model.fit(train)
-        pred = trainer.predict(horizon=13)[['ds', 'yhat']]   
+        pred = trainer.predict(horizon=13)[['ds', 'yhat']]
         return pred, train
-        
+
     def EU_Elec_mix_2030(self):
         '''Target EU Energy Mix in Electricity production upto 2030'''
         EU_Elec_mix_2030 = pd.read_csv('raw_data/Electricity_mix_2030.csv', encoding = 'unicode_escape')
@@ -85,7 +85,7 @@ class EuElecProduction():
         used_pred = pred.iloc[25:41]
         final_mix = EU_Elec_mix_2030.mul(used_pred.yhat);
         return final_mix
-          
+
     def GEP_pred_vs_Actual(self):
         pred =  self.pred()
         train = self.train()
@@ -95,7 +95,7 @@ class EuElecProduction():
                  },title="EU GEP Actual vs Prediction")
         fig.add_trace(go.Scatter(x = pred.ds, y = train.y, showlegend=False))
         return fig
-    
+
     def Elec_Mix_chart(self):
         chart_data = self.final_mix()
         st.area_chart(chart_data)
@@ -105,36 +105,36 @@ class EuElecProduction():
         Elec_production_germany = EU_production_annual[EU_production_annual['Alpha_2_code'] == 'DE']
         Gross_Net_Elec_Prod_Germany = Elec_production_germany.groupby(Elec_production_germany['nrg_bal']).sum()
         return Gross_Net_Elec_Prod_Germany
-    
+
     def groupby_quartiles(df, columnname, quartiles_asc):
         '''Group EU Electricity producing countries by quartiles'''
         df[columnname + '_perc'] = df[columnname]/df[columnname].sum()*100
         cumulative = df[columnname + '_perc'].sort_values(ascending=quartiles_asc).cumsum()
-        
+
         if quartiles_asc == False:
             df['highest_quartile'] = cumulative >= 75
             df['2nd_highest_quartile'] = cumulative.between(50,75, inclusive='left')
             df['2nd_lowest_quartile'] = cumulative.between(25,50, inclusive='left')
             df['lowest_quartile'] = cumulative < 25
-        
+
         elif quartiles_asc == True:
             df['lowest_quartile'] = cumulative <= 25
             df['2nd_lowest_quartile'] = cumulative.between(25,50, inclusive='right')
             df['2nd_highest_quartile'] = cumulative.between(50,75, inclusive='right')
             df['highest_quartile'] = cumulative > 75
-        
+
         df['quartile'] = (df.iloc[:, 1:] == 1).idxmax(1)
         df.set_index('quartile',inplace=True)
-        
+
         df = df.loc[:,'1990':'2020']
         df = df.groupby('quartile').sum()
-        
+
         return df
-    
+
     # def groupby_quartiles_2020(df, columnname, quartiles_asc):
     #     EU_Elec_prod_NEP_Quartiles = EuElecProduction.groupby_quartiles(EU_Elec_prod_NEP, '2020', quartiles_asc=True)
 
-    
+
 
 if __name__ == '__main__':
     preproccer = EuElecProduction(path)

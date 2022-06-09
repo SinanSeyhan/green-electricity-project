@@ -66,6 +66,13 @@ if run:
 
 ###########################################
 
+###############################
+## PRODUCTION ##
+###############################
+
+# path = '../raw_data/Production_Cleaned.csv'
+# production_module = importlib.import_module("green-electricity-project.production_viz", package=True).EuElecProduction()
+# st.plotly_chart(production_module.GEP_pred_vs_Actual(), sharing='streamlit')
 
 ###############################
 ## ENERGY MIX ##
@@ -114,9 +121,9 @@ st.markdown("""---""")
 ## IMPORTS ##
 ###############################
 
-st.markdown("""---""")
 st.title(''' **Imports** ''')
 imports_module = importlib.import_module("green-electricity-project.Electricity_Imports", package=True).Imports()
 st.plotly_chart(figure_or_data=imports_module.EU_visualize(), sharing='streamlit')
+st.markdown("""---""")
 
 ###########################################
