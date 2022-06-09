@@ -3,6 +3,7 @@ import importlib
 import pandas as pd
 import folium
 from streamlit_folium import st_folium
+import os
 
 
 st.title('Green Electricity')
@@ -16,22 +17,25 @@ st.title('Consumption')
 consumption_module = importlib.import_module(
     "green-electricity-project.consumption_viz_and_pred", package=True)
 
-option_cons = st.selectbox(
-    'Select a country',
-    ('EU', 'Austria', 'Belgium', 'Bulgaria', 'Croatia', 'Cyprus', 'Czech Republic',
-     'Denmark', 'Estonia', 'Finland', 'France', 'Germany', 'Greece', 'Hungary',
-     'Ireland', 'Italy', 'Latvia', 'Lithuania', 'Luxembourg', 'Malta',
-     'Netherlands', 'Poland', 'Portugal', 'Romania', 'Slovakia', 'Slovenia',
-     'Spain', 'Sweden'),
-    key='option_cons')
+load_prepared_predictions = True
 
-run = st.button("Predict Future Consumption")
+if load_prepared_predictions == False:
+    option_cons = st.selectbox(
+        'Select a country',
+        ('EU', 'Austria', 'Belgium', 'Bulgaria', 'Croatia', 'Cyprus', 'Czech Republic',
+        'Denmark', 'Estonia', 'Finland', 'France', 'Germany', 'Greece', 'Hungary',
+        'Ireland', 'Italy', 'Latvia', 'Lithuania', 'Luxembourg', 'Malta',
+        'Netherlands', 'Poland', 'Portugal', 'Romania', 'Slovakia', 'Slovenia',
+        'Spain', 'Sweden'),
+        key='option_cons')
 
-if run:
-    info = st.empty()
-    info.write('Predicting the future of electricity consumption...')
-    consumption = consumption_module.ConsumptionVaP(option_cons)
-    consumption.run_viz_and_pred(info)
+    run = st.button("Predict Future Consumption")
+
+    if run:
+        info = st.empty()
+        info.write('Predicting the future of electricity consumption...')
+        consumption = consumption_module.ConsumptionVaP(option_cons)
+        consumption.run_viz_and_pred(info)
 
     st.markdown(''' ****Historic Consumption 1990 - 2020**** ''')
 
@@ -63,6 +67,49 @@ if run:
         unsafe_allow_html=True)
 
     st.plotly_chart(consumption.fig_pred, use_container_width=True)
+
+if load_prepared_predictions == True:
+    option_cons = 'EU'
+    forecast_files = sorted(
+            os.listdir('raw_data/forecast_consumption_eu/'))
+
+    forecasts_loaded = []
+    for i in forecast_files:
+        path = ''.join(('raw_data/forecast_consumption_eu/', i))
+        forecasts_loaded.append(pd.read_csv(path))
+
+    st.markdown(''' ****Historic Consumption 1990 - 2020**** ''')
+
+    st.plotly_chart(consumption.fig, use_container_width=True)
+
+    st.markdown(''' ****Prediction of selected consumption category**** ''')
+
+    real_tot_cons_2019 = round(
+        consumption.consumption_data.sum()['2015':'2019'].mean())
+    pred_tot_cons_2030 = round(consumption.total_future_consumption[40])
+
+    rise_perc = round(
+        (pred_tot_cons_2030 - real_tot_cons_2019) / real_tot_cons_2019 * 100,
+        2)
+
+    if option_cons in ['Czech Republic', 'Netherlands', 'EU']:
+        st.markdown(
+            f'Until 2030 the total energy consumption of the <font color="red"><b>{option_cons}</b></font> will change by about',
+            unsafe_allow_html=True)
+    else:
+        st.markdown(
+            f'Until 2030 the total energy consumption of <font color="red"><b>{option_cons}</b></font> will change by about',
+            unsafe_allow_html=True)
+
+    st.markdown('<style>.big-font {font-size:50px !important;}</style>',
+                unsafe_allow_html=True)
+    st.markdown(
+        f'<p class="big-font"><font color="red"><b>{rise_perc:+} %</b></font></p>',
+        unsafe_allow_html=True)
+
+    st.plotly_chart(consumption.fig_pred, use_container_width=True)
+
+
 st.markdown("""---""")
 ###########################################
 
