@@ -9,12 +9,14 @@ import plotly.graph_objects as go
 import streamlit as st
 
 
-path = '../raw_data/Production_Cleaned.csv'
+
 
 class EuElecProduction():
 
-    def __init__(self, path):
+    def __init__(self):
         self.df = None
+        my_path = os.path.abspath(os.path.dirname(__file__))
+        path = os.path.join(my_path, '../raw_data/Production_Cleaned.csv')
         self.path = path
         self.columns = ['1990','1991','1992','1993','1994','1995','1996','1997','1998','1999','2000',
                 '2001','2002','2003','2004','2005','2006','2007','2008','2009','2010',
@@ -28,8 +30,9 @@ class EuElecProduction():
     def EU_production_annual(self):
         '''Filtering Energy Production data to EU-27 Countries only and to (also excluding the
         UK from EU) + adding 3 letter country codes'''
-
-        countries = pd.read_csv('raw_data/CountryCodes.csv', encoding = 'unicode_escape')
+        my_path = os.path.abspath(os.path.dirname(__file__))
+        path_country = os.path.join(my_path, '../raw_data/CountryCodes.csv')
+        countries = pd.read_csv(path_country, encoding = 'unicode_escape')
         countries.drop(columns=['Numeric'], inplace=True)
         self.df = self.df.merge(countries, on='Alpha_2_code', how='left')
 
@@ -87,8 +90,8 @@ class EuElecProduction():
         return final_mix
 
     def GEP_pred_vs_Actual(self):
-        pred =  self.pred()
-        train = self.train()
+        pred, train =  self.EU_GEP_pred()
+        # train = self.EU_GEP_pred()
         fig = px.line(pred, x=pred.ds, y=pred.yhat, labels={
                      'ds': 'Years',
                      'yhat': 'GEP in TWh'
@@ -137,6 +140,8 @@ class EuElecProduction():
 
 
 if __name__ == '__main__':
+    my_path = os.path.abspath(os.path.dirname(__file__))
+    path = os.path.join(my_path, '../raw_data/Production_Cleaned.csv')
     preproccer = EuElecProduction(path)
     preproccer.get_data()
     EU_countries = EuElecProduction.EU_countries()
