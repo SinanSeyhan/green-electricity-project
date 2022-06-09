@@ -2,6 +2,12 @@ import pandas as pd
 import matplotlib.pyplot as plt
 import numpy as np
 import seaborn as sns
+import importlib
+import os
+import plotly.express as px
+import plotly.graph_objects as go
+import streamlit as st
+
 
 path = '../raw_data/Production_Cleaned.csv'
 
@@ -24,6 +30,7 @@ class EuElecProduction():
         UK from EU) + adding 3 letter country codes'''
 
         countries = pd.read_csv('raw_data/CountryCodes.csv', encoding = 'unicode_escape')
+        countries.drop(columns=['Numeric'], inplace=True)
         self.df = self.df.merge(countries, on='Alpha_2_code', how='left')
 
         '''Create a dataframe for EU countries along with alpha-2-code'''
@@ -55,60 +62,50 @@ class EuElecProduction():
     def EU_Total_Elec_nrg_bal(self):
         EU_production_annual =  self.EU_production_annual()
         EU_production_annual[self.columns]= EU_production_annual[self.columns].apply(pd.to_numeric, errors = 'coerce')
-        EU_production_annual_nrg_bal = EU_production_annual.groupby('nrg_bal').sum()
-        return EU_production_annual_nrg_bal
+        EU_Total_Elec_nrg_bal = EU_production_annual.groupby('nrg_bal').sum()
+        return EU_Total_Elec_nrg_bal
             
-
-    def EU_Total_NEP(self):
-        #Adding EU Total NEP by year as a separate dataframe (for easy further analysis)
-        EU_production_annual_nrg_bal =  self.EU_production_annual_nrg_bal()
-        EU_Total_NEP =  EU_production_annual_nrg_bal.loc[EU_production_annual_nrg_bal['nrg_bal'] == 'NEP']
-        # EU_Total_NEP = EU_production_annual.loc[EU_production_annual['nrg_bal'] == 'NEP'].sum()
-        # EU_Total_NEP = pd.DataFrame(EU_production_annual[self.columns].sum())
-        # EU_Total_NEP = EU_Total_NEP.rename(columns={0:'NEP'})
-        return EU_Total_NEP
-
-    def EU_Total_GEP(self, EU_production_annual):
-        #Adding EU Total GEP by year as a separate dataframe (for easy further analysis)
+    def EU_GEP_pred(self):
+        '''Predicting EU Electricity production upto 2030 using FB prophet'''
+        EU_Total_Elec_nrg_bal =  self.EU_Total_Elec_nrg_bal()
+        df_GEP = EU_Total_Elec_nrg_bal.loc[EU_Total_Elec_nrg_bal['nrg_bal']== 'GEP']
+        GEP_data = pd.DataFrame(df_GEP[self.columns].sum(numeric_only=True, axis=0))
+        os.chdir('/Users/pratimas/code/SinanSeyhan/green-electricity-project')
+        trainer = importlib.import_module("green-electricity-project.trainer", package=True).Trainer()
+        train, test = trainer.split(GEP_data, year='2018')
+        model = trainer.initialize_model()
+        model.fit(train)
+        pred = trainer.predict(horizon=13)[['ds', 'yhat']]   
+        return pred, train
+        
+    def EU_Elec_mix_2030(self):
+        '''Target EU Energy Mix in Electricity production upto 2030'''
+        EU_Elec_mix_2030 = pd.read_csv('raw_data/Electricity_mix_2030.csv', encoding = 'unicode_escape')
+        pred = self.pred()
+        used_pred = pred.iloc[25:41]
+        final_mix = EU_Elec_mix_2030.mul(used_pred.yhat);
+        return final_mix
+          
+    def GEP_pred_vs_Actual(self):
+        pred =  self.pred()
+        train = self.train()
+        fig = px.line(pred, x=pred.ds, y=pred.yhat, labels={
+                     'ds': 'Years',
+                     'yhat': 'GEP in TWh'
+                 },title="EU GEP Actual vs Prediction")
+        fig.add_trace(go.Scatter(x = pred.ds, y = train.y, showlegend=False))
+        return fig
     
-        EU_Total_GEP = EU_production_annual.loc[EU_production_annual['nrg_bal'] == 'GEP']
-        EU_Total_GEP = pd.DataFrame(EU_production_annual[self.columns].sum())
-        EU_Total_GEP = EU_Total_GEP.rename(columns={0:'GEP'})
-        return EU_Total_GEP
+    def Elec_Mix_chart(self):
+        chart_data = self.final_mix()
+        st.area_chart(chart_data)
 
-    def GEP_vs_NEP(EU_production_annual):
-        #EU Electricity Production Comparision: GEP vs NEP
-        EU_production_annual_nrg_bal = EU_production_annual.groupby('nrg_bal').sum()
-        EU_production_annual_nrg_bal.reset_index(inplace=True)
-        mask = EU_production_annual_nrg_bal.loc[:, '1990':'2020'] == 0
-        plt.figure(figsize=(10,5))
-        sns.heatmap(EU_production_annual_nrg_bal.loc[:, '1990':'2020'], yticklabels=EU_production_annual_nrg_bal['nrg_bal'], mask=mask, cmap="viridis")
-        EU_production_annual_nrg_bal.set_index('nrg_bal').loc[:, '1990':'2020'].T.plot(figsize=(10,5))
-        plt.show()
-
-    def Germany_analysis(EU_production_annual):
+    def Germany_analysis(self):
         '''Electricity Production analysis by country (example: Germany)'''
         Elec_production_germany = EU_production_annual[EU_production_annual['Alpha_2_code'] == 'DE']
         Gross_Net_Elec_Prod_Germany = Elec_production_germany.groupby(Elec_production_germany['nrg_bal']).sum()
         return Gross_Net_Elec_Prod_Germany
-
-    def EU_production_annual_totals(EU_production_annual):
-
-        #Converting all data to floats to do math on them
-        EU_production_annual_float = EU_production_annual.loc[:, '1990':'2020'].replace(': ',np.nan).astype(float)
-        EU_production_annual_float = pd.merge(EU_production_annual.loc[:, :'Alpha_2_code'], EU_production_annual_float, left_index=True, right_index=True)
-        EU_production_annual_totals = EU_production_annual_float.groupby('Alpha_2_code').sum()
-        return EU_production_annual_totals
-
-    def EU_Elec_1990_to_2020(EU_production_annual_totals):
-        #Heatmaps Comparison of Electricity Production 
-        mask = EU_production_annual_totals.loc[:, '1990':'2020'] == 0
-        plt.figure(figsize=(20,15))
-        sns.heatmap(EU_production_annual_totals.loc[:, '1990':'2020'], yticklabels=EU_production_annual_totals['Alpha_2_code'], mask=mask, cmap="viridis")
-        plt.show()
-
     
-
     def groupby_quartiles(df, columnname, quartiles_asc):
         '''Group EU Electricity producing countries by quartiles'''
         df[columnname + '_perc'] = df[columnname]/df[columnname].sum()*100
@@ -137,9 +134,7 @@ class EuElecProduction():
     # def groupby_quartiles_2020(df, columnname, quartiles_asc):
     #     EU_Elec_prod_NEP_Quartiles = EuElecProduction.groupby_quartiles(EU_Elec_prod_NEP, '2020', quartiles_asc=True)
 
-
-
-
+    
 
 if __name__ == '__main__':
     preproccer = EuElecProduction(path)

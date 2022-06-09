@@ -69,6 +69,19 @@ class EuElecProduction():
         EU_Total_Elec_production = EU_production_annual
         return EU_Total_Elec_production
 
+    def EU_Total_NEP(self):
+        #Adding EU Total NEP by year as a separate dataframe (for easy further analysis)
+        EU_Total_Elec_nrg_bal =  self.EU_Total_Elec_nrg_bal()
+        EU_Total_NEP = EU_Total_Elec_nrg_bal[EU_Total_Elec_nrg_bal.index.isin(['NEP'])]
+        return EU_Total_NEP
+
+    def EU_Total_GEP(self):
+        #Adding EU Total GEP by year as a separate dataframe (for easy further analysis)
+        EU_Total_Elec_nrg_bal =  self.EU_Total_Elec_nrg_bal()
+        EU_Total_GEP = EU_Total_Elec_nrg_bal[EU_Total_Elec_nrg_bal.index.isin(['GEP'])]
+        
+        return EU_Total_GEP
+    
     def EU_Total_NEP(EU_production_annual, columns):
         #Adding EU Total NEP by year as a separate dataframe (for easy further analysis)
         EU_Total_NEP = EU_production_annual.loc[EU_production_annual['nrg_bal'] == 'NEP']
