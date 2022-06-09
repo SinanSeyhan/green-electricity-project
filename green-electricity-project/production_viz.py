@@ -68,7 +68,7 @@ class EuElecProduction():
     def EU_GEP_pred(self):
         '''Predicting EU Electricity production upto 2030 using FB prophet'''
         EU_Total_Elec_nrg_bal =  self.EU_Total_Elec_nrg_bal()
-        df_GEP = EU_Total_Elec_nrg_bal.loc[EU_Total_Elec_nrg_bal['nrg_bal']== 'GEP']
+        df_GEP = EU_Total_Elec_nrg_bal.loc[EU_Total_Elec_nrg_bal['nrg_bal']== 'GEP'].reset_index
         GEP_data = pd.DataFrame(df_GEP[self.columns].sum(numeric_only=True, axis=0))
         os.chdir('/Users/pratimas/code/SinanSeyhan/green-electricity-project')
         trainer = importlib.import_module("green-electricity-project.trainer", package=True).Trainer()
@@ -83,7 +83,7 @@ class EuElecProduction():
         EU_Elec_mix_2030 = pd.read_csv('raw_data/Electricity_mix_2030.csv', encoding = 'unicode_escape')
         pred = self.pred()
         used_pred = pred.iloc[25:41]
-        final_mix = EU_Elec_mix_2030.mul(used_pred.yhat);
+        final_mix = EU_Elec_mix_2030.mul(used_pred.yhat)
         return final_mix
           
     def GEP_pred_vs_Actual(self):
