@@ -13,6 +13,7 @@ st.markdown("""---""")
 ###########################################
 
 st.title('Consumption')
+
 consumption_module = importlib.import_module(
     "green-electricity-project.consumption_viz_and_pred", package=True)
 
@@ -30,7 +31,9 @@ run = st.button("Predict Future Consumption")
 if run:
     info = st.empty()
     info.write('Predicting the future of electricity consumption...')
+
     consumption = consumption_module.ConsumptionVaP(option_cons)
+    #@st.cache
     consumption.run_viz_and_pred(info)
 
     st.markdown(''' ****Historic Consumption 1990 - 2020**** ''')
@@ -74,7 +77,7 @@ path = '../raw_data/Production_Cleaned.csv'
 production_module = importlib.import_module("green-electricity-project.production_viz", package=True).EuElecProduction()
 st.plotly_chart(production_module.GEP_pred_vs_Actual(), sharing='streamlit')
 
-st.area_chart(production_module.Elec_Mix_chart())
+#st.area_chart(production_module.Elec_Mix_chart())
 
 
 st.markdown("""---""")
