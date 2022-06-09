@@ -9,7 +9,7 @@ import matplotlib.pyplot as plt
 import importlib
 import streamlit as st
 
-os.chdir('/home/armin/code/SinanSeyhan/green-electricity-project')
+#os.chdir('/home/armin/code/SinanSeyhan/green-electricity-project')
 consumption_module = importlib.import_module(
     "green-electricity-project.consumption", package=True)
 trainer_module = importlib.import_module("green-electricity-project.trainer",
