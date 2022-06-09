@@ -16,8 +16,7 @@ class EuElecProduction():
     def __init__(self):
         self.df = None
         my_path = os.path.abspath(os.path.dirname(__file__))
-        path = os.path.join(my_path, '../raw_data/Production_Cleaned.csv')
-        self.path = path
+        self.path = os.path.join(my_path, '../raw_data/Production_Cleaned.csv')
         self.columns = ['1990','1991','1992','1993','1994','1995','1996','1997','1998','1999','2000',
                 '2001','2002','2003','2004','2005','2006','2007','2008','2009','2010',
                 '2011','2012','2013','2014','2015','2016','2017','2018','2019','2020']
@@ -25,7 +24,10 @@ class EuElecProduction():
     def get_data(self):
         '''Function to Import relevant files and complete preprocessing
         Open EU Electricity production file and inspect'''
-        self.df = pd.read_csv(self.path, encoding = 'unicode_escape')
+        my_path = os.path.abspath(os.path.dirname(__file__))
+        path = os.path.join(my_path, '../raw_data/Production_Cleaned.csv')
+        self.df = pd.read_csv(path, encoding = 'unicode_escape')
+        return self.df
 
     def EU_production_annual(self):
         '''Filtering Energy Production data to EU-27 Countries only and to (also excluding the
@@ -34,7 +36,7 @@ class EuElecProduction():
         path_country = os.path.join(my_path, '../raw_data/CountryCodes.csv')
         countries = pd.read_csv(path_country, encoding = 'unicode_escape')
         countries.drop(columns=['Numeric'], inplace=True)
-        self.df = self.df.merge(countries, on='Alpha_2_code', how='left')
+        self.df = self.get_data().merge(countries, on='Alpha_2_code', how='left')
 
         '''Create a dataframe for EU countries along with alpha-2-code'''
 
@@ -71,9 +73,9 @@ class EuElecProduction():
     def EU_GEP_pred(self):
         '''Predicting EU Electricity production upto 2030 using FB prophet'''
         EU_Total_Elec_nrg_bal =  self.EU_Total_Elec_nrg_bal()
-        df_GEP = EU_Total_Elec_nrg_bal.loc[EU_Total_Elec_nrg_bal['nrg_bal']== 'GEP']
+        df_GEP = EU_Total_Elec_nrg_bal.loc[EU_Total_Elec_nrg_bal.index== 'GEP'].reset_index()
         GEP_data = pd.DataFrame(df_GEP[self.columns].sum(numeric_only=True, axis=0))
-        os.chdir('/Users/pratimas/code/SinanSeyhan/green-electricity-project')
+
         trainer = importlib.import_module("green-electricity-project.trainer", package=True).Trainer()
         train, test = trainer.split(GEP_data, year='2018')
         model = trainer.initialize_model()
@@ -83,8 +85,10 @@ class EuElecProduction():
 
     def EU_Elec_mix_2030(self):
         '''Target EU Energy Mix in Electricity production upto 2030'''
-        EU_Elec_mix_2030 = pd.read_csv('raw_data/Electricity_mix_2030.csv', encoding = 'unicode_escape')
-        pred = self.pred()
+        my_path = os.path.abspath(os.path.dirname(__file__))
+        mix_path = os.path.join(my_path, '../raw_data/Electricity_Mix_2030.csv')
+        EU_Elec_mix_2030 = pd.read_csv(mix_path, encoding = 'unicode_escape')
+        pred = self.EU_GEP_pred()[0]
         used_pred = pred.iloc[25:41]
         final_mix = EU_Elec_mix_2030.mul(used_pred.yhat);
         return final_mix
@@ -100,8 +104,8 @@ class EuElecProduction():
         return fig
 
     def Elec_Mix_chart(self):
-        chart_data = self.final_mix()
-        st.area_chart(chart_data)
+        chart_data = self.EU_Elec_mix_2030()
+        return chart_data
 
     def Germany_analysis(self):
         '''Electricity Production analysis by country (example: Germany)'''
@@ -140,10 +144,12 @@ class EuElecProduction():
 
 
 if __name__ == '__main__':
-    my_path = os.path.abspath(os.path.dirname(__file__))
-    path = os.path.join(my_path, '../raw_data/Production_Cleaned.csv')
-    preproccer = EuElecProduction(path)
-    preproccer.get_data()
-    EU_countries = EuElecProduction.EU_countries()
-    EU_production = preproccer.EU_production()
-    EU_production_annual, columns = preproccer.EU_production_annual(EU_production)
+
+    print(EuElecProduction().Elec_Mix_chart())
+    # my_path = os.path.abspath(os.path.dirname(__file__))
+    # path = os.path.join(my_path, '../raw_data/Production_Cleaned.csv')
+    # preproccer = EuElecProduction(path)
+    # preproccer.get_data()
+    # EU_countries = EuElecProduction.EU_countries()
+    # EU_production = preproccer.EU_production()
+    # EU_production_annual, columns = preproccer.EU_production_annual(EU_production)
