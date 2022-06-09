@@ -64,20 +64,7 @@ if run:
 
     st.plotly_chart(consumption.fig_pred, use_container_width=True)
 
-
-
-###############################
-## IMPORTS ##
-###############################
-
-st.markdown("""---""")
-st.title(''' **Imports** ''')
-imports_module = importlib.import_module("green-electricity-project.Electricity_Imports", package=True).Imports()
-st.plotly_chart(figure_or_data=imports_module.EU_visualize(), sharing='streamlit')
-
 ###########################################
-
-
 
 
 ###############################
@@ -104,8 +91,6 @@ st.markdown("""---""")
 ###########################################
 
 
-
-
 ###########################################
 ## GEOLOCATION POWER PLANTS ##
 ###########################################
@@ -121,24 +106,17 @@ m = power_module.plot_folium(option)
 st_folium(m, width=1000, height=800)
 st.markdown("""---""")
 
+###########################################
 
 
-# st.markdown("""---""")
-# st.markdown(''' **Model** ''')
-# trainer_module = importlib.import_module("green-electricity-project.trainer", package=True).Trainer()
-# consumption_module = importlib.import_module("green-electricity-project.consumption", package=True).Consumption()
-# df = consumption_module.get_consumption()
-# temp = df[df['energy_balance']=='Finalconsumption-transportsector-energyuse']
-# pred = {}
 
-# eu_df = pd.DataFrame(temp.groupby('Alpha_2_code').sum().sum())
-# split = trainer_module.split(eu_df, year='2018')[0]
-# model = trainer_module.initialize_model()
-# model.fit(split)
-# pred = trainer_module.predict(horizon=13)[['ds', 'yhat']]
-# df = pd.DataFrame.from_dict(pred)
-# df
+###############################
+## IMPORTS ##
+###############################
 
-# st.plotly_chart((df.ds, df.yhat))
-# st.plotly_chart(split)
-# st.markdown("""---""")
+st.markdown("""---""")
+st.title(''' **Imports** ''')
+imports_module = importlib.import_module("green-electricity-project.Electricity_Imports", package=True).Imports()
+st.plotly_chart(figure_or_data=imports_module.EU_visualize(), sharing='streamlit')
+
+###########################################
