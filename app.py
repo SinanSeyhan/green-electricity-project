@@ -11,14 +11,15 @@ st.subheader('Electricity, is it green or not?🤔')
 ###############################
         ## IMPORTS ##
 ###############################
+
 st.markdown("""---""")
 st.title(''' **Imports** ''')
 imports_module = importlib.import_module("green-electricity-project.Electricity_Imports", package=True).Imports()
 st.plotly_chart(figure_or_data=imports_module.EU_visualize(), sharing='streamlit')
-#st.plotly_chart(figure_or_data=imports_module.Democracy_visualize(), sharing='streamlit')
+
+###########################################
 
 
-#st.markdown(''' ***Predicting Production*** ''')
 
 
 ###############################
@@ -26,7 +27,7 @@ st.plotly_chart(figure_or_data=imports_module.EU_visualize(), sharing='streamlit
 ###############################
 
 st.markdown("""---""")
-st.title('Energy Mix')
+st.title('Energy Mix of Countries')
 power_module = importlib.import_module("green-electricity-project.powerplants", package=True).PowerPlants()
 df = power_module.get_eu_power_plants()
 # Create dropdown menu:
@@ -42,10 +43,15 @@ st.header(f"{option}'s Energy Mix in Electricity")
 st.plotly_chart(power_module.plot_eu_mix(option), sharing='streamlit')
 st.markdown("""---""")
 
+###########################################
+
+
+
 
 ###########################################
         ## GEOLOCATION POWER PLANTS ##
 ###########################################
+
 st.title('Power Plants Geolocation')
 
 # Create dropdown menu:
@@ -62,6 +68,10 @@ consumption_module = importlib.import_module("green-electricity-project.consumpt
 df = consumption_module.prepare_consumption_and_export()
 
 st.markdown("""---""")
+
+###########################################
+
+
 
 
 # st.markdown("""---""")
