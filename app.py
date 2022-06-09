@@ -4,36 +4,30 @@ import pandas as pd
 import folium
 from streamlit_folium import st_folium
 
-'''
-# ***Green Electricity Project***
 
-TODO:
+st.title('Green Electricity')
+st.subheader('Electricity, is it green or not?🤔')
 
-- HEROKU Connection
+###############################
+        ## IMPORTS ##
+###############################
 
-- Prediction Consumption Chart
-
-- Energy Mix Chart with country filtering - DONE!
-
-- Exports Chart
-
--
-
-'''
 st.markdown("""---""")
-st.title(''' **Democracy Index** ''')
+st.title(''' **Imports** ''')
 imports_module = importlib.import_module("green-electricity-project.Electricity_Imports", package=True).Imports()
 st.plotly_chart(figure_or_data=imports_module.EU_visualize(), sharing='streamlit')
-#st.plotly_chart(figure_or_data=imports_module.Democracy_visualize(), sharing='streamlit')
+
+###########################################
 
 
-#st.markdown(''' ***Predicting Production*** ''')
 
 
+###############################
+        ## ENERGY MIX ##
+###############################
 
-# ENERGY MIX
 st.markdown("""---""")
-st.title('Energy Mix')
+st.title('Energy Mix of Countries')
 power_module = importlib.import_module("green-electricity-project.powerplants", package=True).PowerPlants()
 df = power_module.get_eu_power_plants()
 # Create dropdown menu:
@@ -49,18 +43,30 @@ st.header(f"{option}'s Energy Mix in Electricity")
 st.plotly_chart(power_module.plot_eu_mix(option), sharing='streamlit')
 st.markdown("""---""")
 
+<<<<<<< HEAD
+=======
+###########################################
+
+
+
+
+###########################################
+        ## GEOLOCATION POWER PLANTS ##
+###########################################
+>>>>>>> 9b7b4a322d12ceecb7812b8b6121a2c1d20337bf
 
 st.title('Power Plants Geolocation')
 
 # Create dropdown menu:
 df = power_module.get_geolocation()
 fuel = tuple(sorted(df.primary_fuel.unique()))
-option = st.selectbox(label='Please select the Fuel type you want to see: ', options=fuel)
+option = st.selectbox(label='Please select the Fuel Type you want to see: ', options=fuel)
 
 m = power_module.plot_folium(option)
 st_folium(m, width=1000, height=800)
 st.markdown("""---""")
 
+<<<<<<< HEAD
 st.title('Consumption')
 consumption_module = importlib.import_module(
     "green-electricity-project.consumption_viz_and_pred", package=True)
@@ -112,6 +118,18 @@ if run:
         unsafe_allow_html=True)
 
     st.plotly_chart(consumption.fig_pred, use_container_width=True)
+=======
+st.title(''' ***Consumption*** ''')
+consumption_module = importlib.import_module("green-electricity-project.consumption", package=True).Consumption()
+df = consumption_module.prepare_consumption_and_export()
+
+st.markdown("""---""")
+
+###########################################
+
+
+
+>>>>>>> 9b7b4a322d12ceecb7812b8b6121a2c1d20337bf
 
 # st.markdown("""---""")
 # st.markdown(''' **Model** ''')
