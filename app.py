@@ -8,7 +8,9 @@ from streamlit_folium import st_folium
 st.title('Green Electricity')
 st.subheader('Electricity, is it green or not?🤔')
 
-
+###############################
+        ## IMPORTS ##
+###############################
 st.markdown("""---""")
 st.title(''' **Imports** ''')
 imports_module = importlib.import_module("green-electricity-project.Electricity_Imports", package=True).Imports()
@@ -19,8 +21,10 @@ st.plotly_chart(figure_or_data=imports_module.EU_visualize(), sharing='streamlit
 #st.markdown(''' ***Predicting Production*** ''')
 
 
+###############################
+        ## ENERGY MIX ##
+###############################
 
-# ENERGY MIX
 st.markdown("""---""")
 st.title('Energy Mix')
 power_module = importlib.import_module("green-electricity-project.powerplants", package=True).PowerPlants()
@@ -38,12 +42,16 @@ st.header(f"{option}'s Energy Mix in Electricity")
 st.plotly_chart(power_module.plot_eu_mix(option), sharing='streamlit')
 st.markdown("""---""")
 
+
+###########################################
+        ## GEOLOCATION POWER PLANTS ##
+###########################################
 st.title('Power Plants Geolocation')
 
 # Create dropdown menu:
 df = power_module.get_geolocation()
 fuel = tuple(sorted(df.primary_fuel.unique()))
-option = st.selectbox(label='Please select the Fuel type you want to see: ', options=fuel)
+option = st.selectbox(label='Please select the Fuel Type you want to see: ', options=fuel)
 
 m = power_module.plot_folium(option)
 st_folium(m, width=1000, height=800)
@@ -52,7 +60,7 @@ st.markdown("""---""")
 st.title(''' ***Consumption*** ''')
 consumption_module = importlib.import_module("green-electricity-project.consumption", package=True).Consumption()
 df = consumption_module.prepare_consumption_and_export()
-df
+
 st.markdown("""---""")
 
 

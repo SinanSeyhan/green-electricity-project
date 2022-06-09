@@ -194,7 +194,7 @@ class PowerPlants():
         '''
         Function to get the Folium Map for the Power Plants in EU
         '''
-        EU_COORDINATES = (49.5260, 15.2551)
+        EU_COORDINATES = (55.5260, 22.2551)
 
         # country_long  capacity_mw  latitude  longitude primary_fuel
         df = self.get_geolocation()
